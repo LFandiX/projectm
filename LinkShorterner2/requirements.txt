@@ -1,0 +1,5 @@
+flask
+requests
+postgrest-py
+python-dotenv
+supabase
