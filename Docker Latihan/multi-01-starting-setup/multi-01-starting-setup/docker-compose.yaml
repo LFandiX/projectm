@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+ # docker run --network myexam-network  --name mongodb  --rm  -v data:/data/db  mongo:latest
+  mongodb:
+    image: 'mongo:latest'
+    container_name: mongodb
+    volumes:
+      - data:/data/db
+    environment:
+      MONGODB_INITDB_ROOT_USERNAME: admin
+      MONGODB_INITDB_ROOT_PASSWORD: snoopy
+
+  backend:
+    build: ./backend
+    ports:
+    - '80:80'
+    volumes:
+    - logs:/app/logs
+    - ./backend:/app
+    env_file:
+    - ./env/backend.env
+    depends_on:
+    - mongodb
+
+# env_file:
+# - ./env/mongo.env
+volumes: 
+  data:
+  logs:
+
+
+
+
+
+
+
+
+
+
+
+# Frontnd docker compose
+# how to set db password in backend container

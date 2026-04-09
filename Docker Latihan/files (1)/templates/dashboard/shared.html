@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ file.name }} — Shared via NexDrive{% endblock %}
+{% block body %}
+<div class="shared-wrap">
+  <div class="shared-card">
+    <div class="shared-logo"><div class="logo-icon"><i class="fa fa-cloud-upload-alt"></i></div><div class="logo-text">Nex<span>Drive</span></div></div>
+    <div class="shared-file-icon" style="color:{{ file_color(file.file_type) }}">
+      <i class="fa {{ file_icon(file.file_type) }}"></i>
+    </div>
+    <h2 class="shared-name">{{ file.name }}</h2>
+    <div class="shared-meta">
+      <span><i class="fa fa-weight-hanging"></i> {{ file.size | filesize }}</span>
+      <span><i class="fa fa-user"></i> {{ owner.username }}</span>
+      <span><i class="fa fa-download"></i> {{ file.download_count }} unduhan</span>
+    </div>
+    <a href="{{ url_for('dashboard.download_shared', token=file.share_token) }}" class="btn-primary btn-large">
+      <i class="fa fa-download"></i> Unduh File
+    </a>
+  </div>
+</div>
+{% endblock %}

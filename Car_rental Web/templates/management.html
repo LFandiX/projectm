@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width= , initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="text-gray-600">
+    <div>
+      <!--  content wraper -->
+      <div>
+        <nav class="bg-gray-200">
+          <div class="flex justify-between place-items-center">
+            <div class="flex place-items-center">
+              <h1 class="font-bold uppercase p-4 border-b border-gray-100">
+                <a href="/">SEWANITY</a>
+              </h1>
+              <ul class="flex">
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </div>
+      <main>
+        <form
+            action="/management"
+            method="get"
+            class="ml-5 flex gap-5 pt-2 flex flex-col md:flex md:flex-row"
+          >
+            <div class="flex place-items-center gap-5">
+              <label for="status">Status:</label>
+              <select
+                name="status"
+                id="status"
+                class="bg-gray-200 rounded p-1 mr-1"
+              >
+                <option value="all">All</option>
+                <option value="Completed">Completed</option>
+                <option value="Waiting For Approval">Waiting For Approval</option>
+                <option value="Ongoing">Ongoing</option>
+              </select>
+            </div>
+
+
+            <input
+              type="submit"
+              value="Submit"
+              class="border border-gray-200 p-1 bg-blue-200"
+            />
+          </form>
+          
+        <table class="w-full text-lg text-left rtl:text-right text-gray-500">
+          <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3">Image</th>
+              <th scope="col" class="px-6 py-3">Car</th>
+              <th scope="col" class="px-6 py-3">Rented By</th>
+              <th scope="col" class="px-6 py-3">Rent Date</th>
+              <th scope="col" class="px-6 py-3">Return Date</th>
+              <th scope="col" class="px-6 py-3">Price</th>
+              <th scope="col" class="px-6 py-3">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for car in rentals %}
+            <tr class="bg-white border-b border-gray-200">
+              <td class="px-6 py-4">
+                <img
+                  class="w-32"
+                  src="{{ url_for('static', filename=car['image_link']) }}"
+                  alt="Agya"
+                />
+              </td>
+              <th
+              scope="row"
+              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+              >
+              {{car['brand'] + " " + car['model']}}
+            </th>
+            <td class="px-6 py-4">{{ car['username']}}</td>
+
+              <td class="px-6 py-4">{{ car['start_date']}}</td>
+              <td class="px-6 py-4">{{ car['end_date']}}</td>
+              <td class="px-6 py-4">Rp.{{car['total_price']}}</td>
+              <td class="px-6 py-4">{{ car['status'] }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </main>
+    </div>
+  </body>
+</html>

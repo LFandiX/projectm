@@ -1,0 +1,52 @@
+2025-11-25 22:04:58 - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.252.253.15:5000
+2025-11-25 22:04:58 - [33mPress CTRL+C to quit[0m
+2025-11-25 22:04:58 -  * Restarting with watchdog (windowsapi)
+2025-11-25 22:04:58 -  * Debugger is active!
+2025-11-25 22:04:58 -  * Debugger PIN: 985-293-336
+2025-11-25 22:05:00 - SOURCE_IP:127.0.0.1 - REQUEST:/login?username=' OR '1'='1
+2025-11-25 22:05:00 - 127.0.0.1 - - [25/Nov/2025 22:05:00] "GET /login?username='%20OR%20'1'='1 HTTP/1.1" 200 -
+2025-11-25 22:10:54 - SOURCE_IP:127.0.0.1 - REQUEST:/login?username=' OR '1'='1
+2025-11-25 22:10:54 - 127.0.0.1 - - [25/Nov/2025 22:10:54] "GET /login?username='%20OR%20'1'='1 HTTP/1.1" 200 -
+2025-11-25 22:28:31 - 127.0.0.1 - - [25/Nov/2025 22:28:31] "GET / HTTP/1.1" 200 -
+2025-11-25 22:28:32 - 127.0.0.1 - - [25/Nov/2025 22:28:32] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-11-25 22:29:56 - SOURCE_IP:127.0.0.1 - REQUEST:/login?username=' OR '1'='1
+2025-11-25 22:29:56 - 127.0.0.1 - - [25/Nov/2025 22:29:56] "GET /login?username='%20OR%20'1'='1 HTTP/1.1" 200 -
+2025-11-25 22:31:31 - SOURCE_IP:127.0.0.1 - REQUEST:/login?username=' OR '1'='1
+2025-11-25 22:31:31 - 127.0.0.1 - - [25/Nov/2025 22:31:31] "GET /login?username='%20OR%20'1'='1 HTTP/1.1" 200 -
+2025-11-25 22:33:04 - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.252.253.15:5000
+2025-11-25 22:33:04 - [33mPress CTRL+C to quit[0m
+2025-11-25 22:33:04 -  * Restarting with watchdog (windowsapi)
+2025-11-25 22:33:04 -  * Debugger is active!
+2025-11-25 22:33:05 -  * Debugger PIN: 985-293-336
+2025-11-25 22:33:47 - SOURCE_IP:192.168.56.1 - REQUEST:/login?username=' OR '1'='1
+2025-11-25 22:33:47 - 192.168.56.1 - - [25/Nov/2025 22:33:47] "GET /login?username='%20OR%20'1'='1 HTTP/1.1" 200 -
+2025-11-25 22:33:47 - 192.168.56.1 - - [25/Nov/2025 22:33:47] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-11-25 22:38:50 - SOURCE_IP:192.168.56.1 - REQUEST:/login?username=' OR '1'='1
+2025-11-25 22:38:50 - 192.168.56.1 - - [25/Nov/2025 22:38:50] "GET /login?username='%20OR%20'1'='1 HTTP/1.1" 200 -
+2025-11-25 22:44:10 -  * Detected change in 'c:\\Users\\Alfandi\\Documents\\Project_Alfandi\\TugasSiberSQLInj\\app.py', reloading
+2025-11-25 22:44:11 -  * Restarting with watchdog (windowsapi)
+2025-11-25 22:44:12 -  * Debugger is active!
+2025-11-25 22:44:12 -  * Debugger PIN: 985-293-336
+2025-11-25 22:44:15 -  * Detected change in 'C:\\Python311\\Lib\\logging\\__init__.py', reloading
+2025-11-25 22:44:15 -  * Restarting with watchdog (windowsapi)
+2025-11-25 22:44:15 -  * Debugger is active!
+2025-11-25 22:44:15 -  * Debugger PIN: 985-293-336
+2025-11-25 22:45:05 -  * Detected change in 'c:\\Users\\Alfandi\\Documents\\Project_Alfandi\\TugasSiberSQLInj\\app.py', reloading
+2025-11-25 22:45:05 -  * Detected change in 'c:\\Users\\Alfandi\\Documents\\Project_Alfandi\\TugasSiberSQLInj\\app.py', reloading
+2025-11-25 22:45:06 -  * Restarting with watchdog (windowsapi)
+Nov 25 22:45:06 my-flask-app:  * Debugger is active!
+Nov 25 22:45:06 my-flask-app:  * Debugger PIN: 985-293-336
+Nov 25 22:45:12 my-flask-app: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.252.253.15:5000
+Nov 25 22:45:12 my-flask-app: [33mPress CTRL+C to quit[0m
+Nov 25 22:45:12 my-flask-app:  * Restarting with watchdog (windowsapi)
+Nov 25 22:45:13 my-flask-app:  * Debugger is active!
+Nov 25 22:45:13 my-flask-app:  * Debugger PIN: 985-293-336

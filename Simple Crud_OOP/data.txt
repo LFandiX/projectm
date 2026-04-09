@@ -1,0 +1,10 @@
+1,Elon Musk,52,Pretoria,28 Juni 1971,230B,Amerika,Tesla,Otomotif,PhD Physics and Economics
+2,Bernard Arnault,75,Roubaix,5 Maret 1949,210B,Prancis,LVMH,Barang Mewah,Masters in Engineering
+3,Jeff Bezos,60,Albuquerque,12 Januari 1964,160B,Amerika,Amazon,E-Commerce,Bachelor's in Electrical Engineering
+4,Bill Gates,68,Seattle,28 Oktober 1955,120B,Amerika,Microsoft,Teknologi,Dropout Harvard
+5,Warren Buffett,94,Omaha,30 Agustus 1930,110B,Amerika,Berkshire Hathaway,Investasi,Bachelor's in Economics
+6,Larry Ellison,80,New York City,17 Agustus 1944,105B,Amerika,Oracle,Teknologi,Dropout University of Chicago
+7,Larry Page,51,East Lansing,26 Maret 1973,100B,Amerika,Google,Teknologi,PhD in Computer Science
+8,Sergey Brin,51,Moscow,21 Agustus 1973,98B,Amerika,Google,Teknologi,PhD in Computer Science
+9,Mark Zuckerberg,40,White Plains,14 Mei 1984,95B,Amerika,Meta,Teknologi,Dropout Harvard
+10,Steve Ballmer,67,Detroit,24 Maret 1956,93B,Amerika,Microsoft,Teknologi,MBA Stanford

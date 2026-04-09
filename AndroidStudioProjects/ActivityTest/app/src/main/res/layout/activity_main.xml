@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/mainact"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Main Activity" />
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Button 1" />
+
+    <Button
+        android:id="@+id/button_destroy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Destroy Activity" />
+
+    <Button
+        android:id="@+id/button_open"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Second Activity" />
+    <Button
+        android:id="@+id/button_open2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Implisit Intent" />
+    <Button
+        android:id="@+id/btnCommonUI"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Common UI" />
+</LinearLayout>
+

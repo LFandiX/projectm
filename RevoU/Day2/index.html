@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=search" />
+    <title>Latihan 1 HTML - Basic 1 FE</title>
+</head>
+<body>
+    <h1>Ini heading 1</h1>
+    <h2>Ini heading 2</h2>
+    <h3>Ini heading 3</h3>  
+    <h4>Ini heading 4</h4>
+    <h5>Ini heading 5</h5>
+    <h6>Ini heading 6</h6>
+    <p style="color:red">Ini paragraf pertama</p>
+    <p>Text ini ada <b>Bold</b>nya dan <i>Italic</i>nya. Ada Juga Tulisan yang <sub>Subscript</sub> dan <sup>Superscript</sup>.</p>
+
+    <ul id ="list-1" class="list-1">
+        <li>List 1</li>
+        <li>List 2</li>
+        <li>List 3</li>
+        <li>List 4</li>
+    </ul>
+    <ol>
+        <li>List 1</li>
+        <li>List 2</li>
+        <li>List 3</li>
+        <li>List 4</li>
+    </ol>
+    <dl>
+        <dt>Term 1</dt>
+        <dd>Definition 1</dd>
+        <dt>Term 2</dt>
+        <dd>Definition 2</dd>  
+    </dl>
+    <!-- type disc / none -->
+    <ul type="disc"> 
+        <li>List 1</li>
+        <li>List 2</li>
+        <li>List 3</li>
+        <li>List 4</li>
+    </ul>
+    <table border="1" cellpadding="10" cellspacing="0">
+        <tr>
+            <th>Header 1</th>
+            <th>Header 2</th>
+            <th>Header 3</th>
+        </tr>
+        <tr>
+            <td>Data 1</td>
+            <td>Data 2</td>
+            <td>Data 3</td>
+        </tr>
+    </table>
+    <img src="images/hero.png" alt="Deskripsi Gambar" width="300" height="200" style="object-fit: cover;"/>
+    <br>
+    <a href="https://www.RevoU.co">Link ke RevoU.co</a>
+    <br>
+    <a href="second.html">Link ke Second Page</a>
+    <br>
+    <a href="#list-1">Link ke List 1</a>
+    <br>
+    <h1>Form</h1>
+    <form>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name">
+        <br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email">
+        <br>
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" min="0" max="120">
+        <br>
+        <label for="Komentar" id="Komentar">Komentar:</label>
+        <textarea id="Komentar" name="Komentar" rows="4" cols="50"></textarea>
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+    <span class="material-symbols-outlined">
+search
+</span>
+</body>
+<style>
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
+}
+</style>
+</html>

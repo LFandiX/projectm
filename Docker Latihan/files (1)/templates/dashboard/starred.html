@@ -1,0 +1,33 @@
+{% extends "dashboard/layout.html" %}
+{% block title %}Berbintang — NexDrive{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="breadcrumb"><span class="bc-item active"><i class="fa fa-star"></i> File Berbintang</span></div>
+</div>
+<section class="section">
+  {% if files %}
+  <div class="file-grid">
+    {% for f in files %}
+    <div class="file-card" data-id="{{ f.id }}" data-name="{{ f.name }}">
+      <div class="file-card-top" onclick="openPreview({{ f.id }})">
+        <div class="file-thumb" style="border-color:{{ file_color(f.file_type) }}20">
+          <i class="fa {{ file_icon(f.file_type) }}" style="color:{{ file_color(f.file_type) }}"></i>
+        </div>
+      </div>
+      <div class="file-card-bottom">
+        <div class="file-card-name">{{ f.name | truncate(25) }}</div>
+        <div class="file-card-meta">{{ f.size | filesize }} · {{ f.updated_at | reltime }}</div>
+        <div class="file-card-actions">{% include 'partials/file_actions.html' %}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon"><i class="fa fa-star"></i></div>
+    <h3>Belum ada file berbintang</h3>
+    <p>Klik ikon bintang pada file untuk menandainya</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

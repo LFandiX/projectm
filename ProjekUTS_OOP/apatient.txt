@@ -1,0 +1,10 @@
+Petra Gamma,PAT001,Schizophrenia,-15000,2
+Alvern Brainard,PAT002,Paranoid,15000,2
+Aprinda Kornelius,PAT003,Appendix,40000,10
+Keanrich Cordana,PAT004,Tonsilitis,12000,0
+Alfandi Wijaya,PAT005,Sunburn,11500,0
+Captain America,PAT006,Fever,10000,7
+Black Panther,PAT007,Migraine,16000,4
+Bruce Banner,PAT008,Acne,25000,11
+Gojo Satoru,PAT009,Malaria,22000,0
+Raditya Dika,PAT010,Bronkitis,32000,5

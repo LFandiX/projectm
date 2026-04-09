@@ -1,0 +1,333 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="font-weight-bold text-dark">Manajemen Inventori</h2>
+    <button class="btn btn-primary shadow-sm" data-toggle="modal" data-target="#modalTambah">
+        <i class="fas fa-plus-circle mr-2"></i>Tambah Produk Baru
+    </button>
+</div>
+
+
+
+
+<div class="row mb-4">
+    <div class="col-md-5">
+        <div class="input-group shadow-sm">
+            <div class="input-group-prepend">
+                <span class="input-group-text bg-white border-right-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+            </div>
+            <input type="text" id="searchInput" class="form-control border-left-0" placeholder="Cari SKU atau Nama...">
+        </div>
+    </div>
+    <div class="col-md-3">
+        <select id="stockFilter" class="form-control shadow-sm border-0">
+            <option value="all">-- Semua Status Stok --</option>
+            <option value="low">Stok Menipis (<= 5)</option>
+            <option value="empty">Stok Habis (0)</option>
+            <option value="available">Stok Tersedia (> 5)</option>
+        </select>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="border-0">SKU</th>
+                        <th class="border-0">Nama Produk</th>
+                        <th class="border-0">Stok</th>
+                        <th class="border-0">Harga Beli</th>
+                        <th class="border-0">Harga Jual</th>
+                        <th class="border-0 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="inventoryTable">
+                    {% for item in items %}
+                    <tr>
+                        <td class="align-middle"><code>{{ item.sku }}</code></td>
+                        <td class="align-middle font-weight-bold">{{ item.nama_barang }}</td>
+                        <td class="align-middle">
+                            {% if item.stok <= 5 %} <span class="badge badge-danger p-2">Sisa {{ item.stok }}</span>
+                                {% else %}
+                                <span class="badge badge-info p-2">{{ item.stok }}</span>
+                                {% endif %}
+                        </td>
+                        <td class="align-middle text-muted">Rp {{ "{:,.0f}".format(item.harga_beli) }}</td>
+                        <td class="align-middle text-primary font-weight-bold">Rp {{ "{:,.0f}".format(item.harga_jual)
+                            }}</td>
+
+                        <td class="text-center align-middle">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-sm btn-warning text-dark"
+                                    onclick="openAdjustModal({{ item.id }}, '{{ item.nama_barang }}', {{ item.stok }})"
+                                    title="Penyesuaian Stok (Hilang/Rusak)">
+                                    <i class="fas fa-sync"></i>
+                                </button>
+
+                                <button type="button" class="btn btn-sm btn-success"
+                                    onclick="openStockEntry({{ item.id }}, '{{ item.nama_barang }}')"
+                                    title="Barang Masuk">
+                                    <i class="fas fa-truck-loading"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-info text-white"
+                                    onclick="editProduct({{ item.id }})" title="Edit Detail">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </button>
+                                <a href="/inventory/delete/{{ item.id }}" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('Apakah Anda yakin ingin menghapus {{ item.nama_barang }}?')"
+                                    title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalStockEntry" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content border-0">
+            <form action="/inventory/stock-entry" method="POST">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Stock Entry (Barang Masuk)</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="entry-id">
+                    <p class="text-muted small">Menambah stok untuk produk:</p>
+                    <h5 id="entry-nama" class="mb-3"></h5>
+                    <div class="form-group">
+                        <label>Jumlah Unit yang Masuk</label>
+                        <input type="number" name="jumlah_masuk" class="form-control form-control-lg" min="1" required>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="submit" class="btn btn-success px-4">Update Stok</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalTambah" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content border-0">
+            <form action="/inventory/add" method="POST">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="fas fa-plus-circle mr-2"></i>Tambah Produk Baru</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>SKU / Barcode</label>
+                        <input type="text" name="sku" class="form-control" placeholder="Contoh: BRG001" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Barang</label>
+                        <input type="text" name="nama" class="form-control" placeholder="Nama Produk Lengkap" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Harga Beli (Rp)</label>
+                                <input type="number" name="harga_beli" class="form-control" placeholder="Modal per unit"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Harga Jual (Rp)</label>
+                                <input type="number" name="harga_jual" class="form-control"
+                                    placeholder="Harga ke konsumen" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Stok Awal</label>
+                        <input type="number" name="stok" class="form-control" value="0" required>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success px-4">Simpan Produk</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalEdit" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content border-0">
+            <form action="/inventory/update" method="POST">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">Edit Produk</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="edit-id">
+                    <div class="form-group">
+                        <label>Nama Barang</label>
+                        <input type="text" name="nama" id="edit-nama" class="form-control" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Harga Beli (Rp)</label>
+                                <input type="number" name="harga_beli" id="edit-harga-beli" class="form-control"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Harga Jual (Rp)</label>
+                                <input type="number" name="harga_jual" id="edit-harga-jual" class="form-control"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Stok Saat Ini</label>
+                        <input type="number" name="stok" id="edit-stok" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="submit" class="btn btn-info text-white px-4">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalAdjust" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content border-0">
+            <form action="/inventory/adjust" method="POST">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title font-weight-bold"><i class="fas fa-sync mr-2"></i>Stock Adjustment</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="product_id" id="adjust_product_id">
+                    <div class="form-group">
+                        <label class="text-muted small">Nama Barang</label>
+                        <input type="text" id="adjust_nama_barang" class="form-control font-weight-bold" readonly>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="text-muted small">Stok di Sistem</label>
+                                <input type="number" id="adjust_stok_sistem" class="form-control bg-light" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group text-primary">
+                                <label class="small font-weight-bold">Stok Fisik Sebenarnya</label>
+                                <input type="number" name="stok_fisik" class="form-control border-primary" placeholder="Isi jumlah asli" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="text-muted small">Alasan Penyesuaian</label>
+                        <textarea name="keterangan" class="form-control" rows="3" placeholder="Contoh: Barang rusak saat pengiriman, barang hilang, atau bonus supplier" required></textarea>
+                    </div>
+                    <div class="alert alert-info small">
+                        <i class="fas fa-info-circle mr-1"></i> Penyesuaian ini akan dicatat sebagai riwayat stok manual.
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-warning font-weight-bold">Simpan Penyesuaian</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. LIVE SEARCH FUNCTION
+    const searchInput = document.getElementById('searchInput');
+    const stockFilter = document.getElementById('stockFilter');
+    const tableRows = document.querySelectorAll('#inventoryTable tr');
+
+    function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const filterValue = stockFilter.value;
+
+        tableRows.forEach(row => {
+            const sku = row.cells[0].textContent.toLowerCase();
+            const nama = row.cells[1].textContent.toLowerCase();
+            // Ambil angka stok dari teks di dalam badge
+            const stokText = row.cells[2].textContent.trim().replace('Sisa ', '');
+            const stokNum = parseInt(stokText);
+
+            // Cek kondisi pencarian teks
+            const matchesSearch = sku.includes(searchTerm) || nama.includes(searchTerm);
+
+            // Cek kondisi filter stok
+            let matchesStock = false;
+            if (filterValue === 'all') {
+                matchesStock = true;
+            } else if (filterValue === 'low') {
+                matchesStock = (stokNum <= 5 && stokNum > 0);
+            } else if (filterValue === 'empty') {
+                matchesStock = (stokNum === 0);
+            } else if (filterValue === 'available') {
+                matchesStock = (stokNum > 5);
+            }
+
+            // Tampilkan baris hanya jika kedua kondisi terpenuhi
+            if (matchesSearch && matchesStock) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // Jalankan fungsi setiap kali input atau filter berubah
+    searchInput.addEventListener('keyup', filterTable);
+    stockFilter.addEventListener('change', filterTable);
+
+    // 2. OPEN STOCK ENTRY MODAL
+    function openStockEntry(id, nama) {
+        document.getElementById('entry-id').value = id;
+        document.getElementById('entry-nama').innerText = nama;
+        $('#modalStockEntry').modal('show');
+    }
+
+    // 3. FETCH DATA & OPEN EDIT MODAL
+    function editProduct(id) {
+        fetch('/inventory/get/' + id)
+            .then(response => {
+                if (!response.ok) throw new Error('Data tidak ditemukan');
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('edit-id').value = data.id;
+                document.getElementById('edit-nama').value = data.nama_barang;
+                document.getElementById('edit-harga-beli').value = data.harga_beli;
+                document.getElementById('edit-harga-jual').value = data.harga_jual;
+                document.getElementById('edit-stok').value = data.stok;
+                $('#modalEdit').modal('show');
+            })
+            .catch(err => alert("Gagal mengambil data: " + err));
+    }
+    function openAdjustModal(id, nama, stok) {
+        document.getElementById('adjust_product_id').value = id;
+        document.getElementById('adjust_nama_barang').value = nama;
+        document.getElementById('adjust_stok_sistem').value = stok;
+        $('#modalAdjust').modal('show');
+    }
+</script>
+{% endblock %}

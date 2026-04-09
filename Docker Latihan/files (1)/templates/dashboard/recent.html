@@ -1,0 +1,35 @@
+{% extends "dashboard/layout.html" %}
+{% block title %}Terbaru — NexDrive{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="breadcrumb"><span class="bc-item active"><i class="fa fa-clock"></i> File Terbaru</span></div>
+</div>
+<section class="section">
+  {% if files %}
+  <div class="file-table-wrap">
+    <table class="file-table">
+      <thead><tr><th>Nama</th><th>Tipe</th><th>Ukuran</th><th>Diakses</th><th>Aksi</th></tr></thead>
+      <tbody>
+        {% for f in files %}
+        <tr class="file-row" data-id="{{ f.id }}" data-name="{{ f.name }}">
+          <td class="file-name-cell">
+            <i class="fa {{ file_icon(f.file_type) }}" style="color:{{ file_color(f.file_type) }}"></i>
+            <span onclick="openPreview({{ f.id }})">{{ f.name }}</span>
+          </td>
+          <td><span class="type-badge type-{{ f.file_type }}">{{ f.file_type }}</span></td>
+          <td>{{ f.size | filesize }}</td>
+          <td>{{ f.updated_at | reltime }}</td>
+          <td class="file-actions-cell">{% include 'partials/file_actions.html' %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon"><i class="fa fa-clock"></i></div>
+    <h3>Belum ada file</h3>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

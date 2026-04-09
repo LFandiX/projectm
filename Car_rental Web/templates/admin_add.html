@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width= , initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="text-gray-600">
+    <div>
+      <!--  content wraper -->
+      <div>
+        <nav class="bg-gray-200">
+          <div class="flex justify-between">
+            <div class="flex place-items-center">
+              <h1 class="font-bold uppercase p-4 border-b border-gray-100">
+                <a href="/">SEWANITY</a>
+              </h1>
+              <ul class="flex">
+                <li class="text-gray-700 font-bold ml-2">
+                  <a href="/home">
+                    <span>Home</span>
+                  </a>
+                </li>
+                <li class="text-gray-700 font-bold ml-2">
+                  <a href="/about-us">
+                    <span>About</span>
+                  </a>
+                </li>
+                <li class="text-gray-700 font-bold ml-2">
+                  <a href="/contact">
+                    <span>Contact</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {% if session_user != None %}
+            <div class="flex place-items-center mr-5">
+              <a class="text-red-600 ml-2" href="/logout">Log out</a>
+            </div>
+            {%else%}
+            <div
+              class="flex justify-center md:justify-end place-items-center mr-7"
+            >
+              <a class="text-red-600 ml-2" href="/login">Log in</a>
+              <a class="text-red-600 ml-2" href="/register">Sign up</a>
+            </div>
+            {%endif%}
+          </div>
+        </nav>
+      </div>
+      <main>
+        <section class="bg-white dark:bg-gray-900">
+          <div class="py-8 lg:py-16 px-4 mx-auto max-w-screen-md">
+            <h2
+              class="mb-4 text-4xl tracking-tight font-extrabold text-center text-gray-900 dark:text-white"
+            >
+              Add listing
+            </h2>
+            <form action="#" class="space-y-8">
+              <div>
+                <label
+                  for="subject"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                  >Add Photo</label
+                >
+                <input
+                  type="file"
+                  id="subject"
+                  class="block p-3 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+                  placeholder="Let us know how we can help you"
+                  required
+                />
+              </div>
+              <div>
+                <label
+                  for="subject"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                  >description</label
+                >
+                <input
+                  type="text"
+                  id="subject"
+                  class="block p-3 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+                  placeholder="Let us know how we can help you"
+                  required
+                />
+              </div>
+              <div class="">
+                <label for="cars">Choose a car :</label>
+                <select
+                  name="cars"
+                  id="cars"
+                  class="bg-gray-200 rounded p-1 mr-1"
+                >
+                  <option value="-">-</option>
+                  <option value="volvo">Volvo</option>
+                  <option value="bmw">BMW</option>
+                  <option value="mercedes">Mercedes</option>
+                  <option value="audi">Audi</option>
+                </select>
+              </div>
+
+              <div class="">
+                <label for="cars">Seats :</label>
+                <select
+                  name="seats"
+                  id="seats"
+                  class="bg-gray-200 rounded p-1 mr-1"
+                >
+                  <option value="-">-</option>
+                  <option value="4">4</option>
+                  <option value="6">6</option>
+                  <option value="8">8</option>
+                </select>
+              </div>
+
+              <div class="">
+                <label for="cars">Mode:</label>
+                <select
+                  name="mode"
+                  id="mode"
+                  class="bg-gray-200 rounded p-1 mr-1"
+                >
+                  <option value="-">-</option>
+                  <option value="manual">Manual</option>
+                  <option value="automatic">Matic</option>
+                </select>
+              </div>
+
+              <div class="">
+                <label for="cars">Fuel Type:</label>
+                <select
+                  name="fuel"
+                  id="fuel"
+                  class="bg-gray-200 rounded p-1 mr-1"
+                >
+                  <option value="-">-</option>
+                  <option value="petrol">Petrol</option>
+                  <option value="electric">Electric</option>
+                  <option value="diesel">Diesel</option>
+                </select>
+              </div>
+              <button
+                type="submit"
+                class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              >
+                Add
+              </button>
+            </form>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

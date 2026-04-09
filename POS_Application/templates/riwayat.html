@@ -1,0 +1,135 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <h4 class="font-weight-bold mb-3">Filter Riwayat</h4>
+        <form action="/transactions" method="GET" class="form-inline">
+            <div class="form-group mr-2">
+                <label class="mr-2">Tanggal:</label>
+                <input type="date" name="date" class="form-control" value="{{ request.args.get('date', '') }}">
+            </div>
+            <div class="form-group mr-2">
+                <label class="mr-2">Bulan:</label>
+                <select name="month" class="form-control">
+                    <option value="">-- Semua Bulan --</option>
+                    {% for m in range(1, 13) %}
+                    <option value="{{ m }}" {{ 'selected' if request.args.get('month')|int == m else '' }}>
+                        {{ m }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group mr-2">
+                <label class="mr-2">Tahun:</label>
+                <input type="number" name="year" class="form-control" placeholder="2026" value="{{ request.args.get('year', '') }}">
+            </div>
+            <button type="submit" class="btn btn-primary mr-2"><i class="fas fa-search"></i> Cari</button>
+            <a href="/transactions" class="btn btn-secondary">Reset</a>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th>Waktu</th>
+                    <th>No. Invoice</th>
+                    <th>Kasir</th>
+                    <th>Total Belanja</th>
+                    <th class="text-center">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in history %}
+                <tr>
+                    <td>{{ row.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td><code>{{ row.no_invoice }}</code></td>
+                    <td>{{ row.nama_kasir }}</td>
+                    <td>Rp {{ "{:,.0f}".format(row.total_harga) }}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-info" onclick="viewDetail({{ row.id }})">
+                            <i class="fas fa-eye"></i> Detail & Cetak
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDetail" tabindex="-1">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-body" id="areaCetakNota">
+                <div class="text-center">
+                    <h5 class="font-weight-bold mb-0">TOKO DIGITAL</h5>
+                    <small id="notaWaktu"></small>
+                </div>
+                <hr style="border-top: 1px dashed #000;">
+                <div class="d-flex justify-content-between small">
+                    <span>No: <b id="notaInvoice"></b></span>
+                    <span>Kasir: <b id="notaKasir"></b></span>
+                </div>
+                <hr style="border-top: 1px dashed #000;">
+                <table class="table table-borderless table-sm small">
+                    <tbody id="notaItemsBody"></tbody>
+                </table>
+                <hr style="border-top: 1px dashed #000;">
+                <div class="d-flex justify-content-between small"><span>Total:</span> <span id="notaTotal"></span></div>
+                <div class="d-flex justify-content-between small"><span>Bayar:</span> <span id="notaBayar"></span></div>
+                <div class="d-flex justify-content-between font-weight-bold"><span>Kembali:</span> <span id="notaKembali"></span></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" onclick="printNota()">Cetak Struk</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentData = null;
+
+function viewDetail(id) {
+    fetch(`/transactions/detail/${id}`)
+    .then(res => res.json())
+    .then(data => {
+        if(data.length > 0) {
+            currentData = data;
+            const h = data[0]; // Ambil data header dari item pertama
+            
+            document.getElementById('notaInvoice').innerText = h.no_invoice;
+            document.getElementById('notaWaktu').innerText = h.created_at;
+            document.getElementById('notaKasir').innerText = h.nama_kasir;
+            document.getElementById('notaTotal').innerText = `Rp ${h.total_harga.toLocaleString('id-ID')}`;
+            document.getElementById('notaBayar').innerText = `Rp ${h.bayar.toLocaleString('id-ID')}`;
+            document.getElementById('notaKembali').innerText = `Rp ${h.kembali.toLocaleString('id-ID')}`;
+            
+            let htmlItems = '';
+            data.forEach(item => {
+                htmlItems += `<tr><td>${item.nama_barang}<br>${item.qty} x ${item.harga_jual.toLocaleString('id-ID')}</td><td class="text-right">Rp ${item.subtotal.toLocaleString('id-ID')}</td></tr>`;
+            });
+            document.getElementById('notaItemsBody').innerHTML = htmlItems;
+            $('#modalDetail').modal('show');
+        }
+    });
+}
+
+function printNota() {
+    const content = document.getElementById('areaCetakNota').innerHTML;
+    const win = window.open('', '', 'height=600,width=400');
+    win.document.write('<html><head><title>Print Nota</title>');
+    win.document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">');
+    win.document.write('<style>body{width: 80mm; padding: 20px; font-family: monospace;}</style></head><body>');
+    win.document.write(content);
+    win.document.write('</body></html>');
+    setTimeout(() => { win.print(); win.close(); }, 500);
+}
+</script>
+{% endblock %}

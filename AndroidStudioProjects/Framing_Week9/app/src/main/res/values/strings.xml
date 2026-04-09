@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Framing_Week 9</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="leftFragment">left fragment</string>
+    <string name="rightFragment">right fragment</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

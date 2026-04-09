@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Love Story ❤️</title>
+<style>
+    body {
+        background: linear-gradient(to right, #ff9a9e, #fad0c4);
+        font-family: 'Segoe UI', sans-serif;
+        color: #fff;
+        text-align: center;
+        padding: 30px;
+        overflow: hidden;
+    }
+    h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+    }
+    #story-container {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 20px;
+        border-radius: 20px;
+        max-width: 500px;
+        margin: auto;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        min-height: 120px;
+        font-size: 1.3em;
+    }
+    .choices {
+        margin-top: 20px;
+    }
+    button {
+        padding: 12px 25px;
+        background: #ff6b81;
+        border: none;
+        color: white;
+        border-radius: 20px;
+        margin: 10px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: transform 0.2s;
+    }
+    button:hover {
+        transform: scale(1.05);
+    }
+    .heart {
+        position: absolute;
+        font-size: 20px;
+        color: red;
+        animation: fall 5s linear infinite;
+        opacity: 0.7;
+    }
+    @keyframes fall {
+        0% { transform: translateY(-10vh); }
+        100% { transform: translateY(100vh); }
+    }
+</style>
+</head>
+<body>
+
+<h1>Our Love Story ❤️</h1>
+<div id="story-container"></div>
+<div class="choices" id="choices"></div>
+
+<audio autoplay loop>
+    <source src="https://www.bensound.com/bensound-music/bensound-tenderness.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+    const story = {
+        start: {
+            text: "Hari itu, aku melihat kamu untuk pertama kalinya… Hatiku langsung bergetar. 💘",
+            choices: [
+                { text: "Mendekat dan menyapamu 😊", next: "approach" },
+                { text: "Diam saja sambil mencuri pandang 🙈", next: "shy" }
+            ]
+        },
+        approach: {
+            text: "Aku mendekat dan menyapa. Kamu senyum, dan itu jadi momen terindahku. 🥰",
+            choices: [
+                { text: "Ajak ngobrol lebih lama ☕", next: "talk" },
+                { text: "Memberanikan diri minta nomor 😳", next: "number" }
+            ]
+        },
+        shy: {
+            text: "Aku diam saja… tapi ternyata kamu sadar aku melirikmu dan tersenyum balik. 💓",
+            choices: [
+                { text: "Balas senyum dan lambaikan tangan 👋", next: "wave" },
+                { text: "Mundur perlahan tapi hati berdebar 😍", next: "backoff" }
+            ]
+        },
+        talk: {
+            text: "Kita ngobrol lama, ternyata banyak kesamaan… dari situ aku tau kamu spesial. 💞",
+            choices: [
+                { text: "Ajak kencan pertama ✨", next: "date" }
+            ]
+        },
+        number: {
+            text: "Aku minta nomor kamu dan… YES! Kamu kasih. Malamnya kita chat sampai larut. 💌",
+            choices: [
+                { text: "Ajak ketemuan lagi 💕", next: "date" }
+            ]
+        },
+        wave: {
+            text: "Aku balas senyum dan lambaikan tangan… dan akhirnya kita kenalan. 😍",
+            choices: [
+                { text: "Lanjut ngobrol bareng 🍹", next: "talk" }
+            ]
+        },
+        backoff: {
+            text: "Aku mundur… tapi diam-diam berdoa semoga bisa ketemu kamu lagi. 🙏",
+            choices: [
+                { text: "Dan doa itu terkabul…", next: "approach" }
+            ]
+        },
+        date: {
+            text: "Kita ketemuan dan sejak itu, aku yakin… kamu adalah orang yang aku cari selama ini. ❤️",
+            choices: [
+                { text: "Lanjutkan cerita cinta kita selamanya 💍", next: "end" }
+            ]
+        },
+        end: {
+            text: "Sekarang… kita resmi jadi pasangan paling bahagia. Aku janji akan terus sayang kamu selamanya. 💖",
+            choices: []
+        }
+    };
+
+    let currentScene = "start";
+
+    function typeEffect(element, text, callback) {
+        let i = 0;
+        element.innerHTML = "";
+        const interval = setInterval(() => {
+            element.innerHTML += text.charAt(i);
+            i++;
+            if (i === text.length) {
+                clearInterval(interval);
+                if (callback) callback();
+            }
+        }, 50);
+    }
+
+    function renderScene() {
+        const scene = story[currentScene];
+        const container = document.getElementById('story-container');
+        const choicesDiv = document.getElementById('choices');
+        typeEffect(container, scene.text, () => {
+            choicesDiv.innerHTML = "";
+            scene.choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.textContent = choice.text;
+                btn.onclick = () => {
+                    currentScene = choice.next;
+                    renderScene();
+                };
+                choicesDiv.appendChild(btn);
+            });
+        });
+    }
+
+    function createHeart(){
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        heart.innerHTML = '💗';
+        heart.style.left = Math.random() * window.innerWidth + 'px';
+        heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
+        document.body.appendChild(heart);
+        setTimeout(()=> heart.remove(), 5000);
+    }
+    setInterval(createHeart, 300);
+
+    renderScene();
+</script>
+
+</body>
+</html>

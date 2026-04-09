@@ -1,0 +1,15 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.BibleVerse" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/bg_cream</item>
+        <item name="colorPrimary">@color/blue_900</item>
+        <item name="colorOnPrimary">@color/white</item>
+    </style>
+
+    <style name="Theme.BibleVerse" parent="Base.Theme.BibleVerse" />
+    
+    <style name="CardStyle">
+        <item name="android:background">@color/white</item>
+        <item name="android:padding">16dp</item>
+    </style>
+</resources>

@@ -1,0 +1,486 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm mb-4 border-0">
+            <div class="card-body">
+                <label class="font-weight-bold"><i class="fas fa-barcode mr-2"></i>Input Produk</label>
+                <div class="input-group">
+                    <input type="text" id="barcodeInput" class="form-control form-control-lg" placeholder="Scan Barcode di sini..." autofocus>
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#modalCariBarang">
+                            <i class="fas fa-search mr-2"></i>Cari Manual (F2)
+                        </button>
+                    </div>
+                </div>
+                <small class="text-muted mt-2 d-block">Gunakan Barcode Scanner atau cari berdasarkan SKU.</small>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white font-weight-bold">
+                <i class="fas fa-shopping-cart mr-2"></i>Keranjang Belanja
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-dark text-white">
+                            <tr>
+                                <th>Barang</th>
+                                <th>Harga</th>
+                                <th width="120">Qty</th>
+                                <th>Total</th>
+                                <th width="50"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cartTable">
+                            </tbody>
+                    </table>
+                </div>
+                <div id="cartEmptyMsg" class="text-center p-5 text-muted">
+                    <i class="fas fa-shopping-basket fa-3x mb-3"></i>
+                    <p>Keranjang kosong. Silakan scan barang.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm bg-primary text-white mb-3 border-0">
+            <div class="card-body text-center">
+                <h6 class="text-uppercase small font-weight-bold">Total Belanja</h6>
+                <h1 id="grandTotalDisplay" class="display-4 font-weight-bold">Rp 0</h1>
+            </div>
+        </div>
+        
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <form id="checkoutForm" action="/kasir/checkout" method="POST">
+                    <div class="form-group">
+                        <label class="font-weight-bold">Nominal Bayar (Rp)</label>
+                        <input type="number" id="bayarInput" name="bayar" class="form-control form-control-lg text-primary font-weight-bold" placeholder="0" required>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">Kembalian:</span>
+                        <h4 id="kembalianDisplay" class="text-danger font-weight-bold mb-0">Rp 0</h4>
+                    </div>
+                    
+                    <input type="hidden" name="cart_data" id="cartDataInput">
+                    
+                    <button type="submit" class="btn btn-success btn-block btn-lg shadow-sm" id="btnSelesai" disabled>
+                        <i class="fas fa-check-circle mr-2"></i>Selesaikan Transaksi
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalCariBarang" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg shadow-lg" role="document">
+        <div class="modal-content border-0">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-search mr-2"></i>Cari Produk</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="manualSearchInput" class="form-control form-control-lg mb-4" placeholder="Ketik nama barang atau SKU...">
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table table-hover">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>SKU</th>
+                                <th>Nama Barang</th>
+                                <th>Stok</th>
+                                <th>Harga</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="manualSearchTable">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalNota" tabindex="-1" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body" id="areaCetakNota">
+                <div class="text-center">
+                    <h5 class="font-weight-bold mb-0">TOKO DIGITAL</h5>
+                    <small>Jl. Contoh No. 123, Kota Anda</small><br>
+                    <small id="notaWaktu"></small>
+                </div>
+                <hr style="border-top: 1px dashed #000;">
+                <div class="d-flex justify-content-between small">
+                    <span>No: <b id="notaInvoice"></b></span>
+                    <span>Kasir: <b id="notaKasir"></b></span>
+                </div>
+                <hr style="border-top: 1px dashed #000;">
+                
+                <table class="table table-borderless table-sm small">
+                    <tbody id="notaItems">
+                        </tbody>
+                </table>
+                
+                <hr style="border-top: 1px dashed #000;">
+                <div class="d-flex justify-content-between small">
+                    <span>Total:</span>
+                    <span id="notaTotal"></span>
+                </div>
+                <div class="d-flex justify-content-between small">
+                    <span>Bayar:</span>
+                    <span id="notaBayar"></span>
+                </div>
+                <div class="d-flex justify-content-between font-weight-bold">
+                    <span>Kembali:</span>
+                    <span id="notaKembali"></span>
+                </div>
+                <hr style="border-top: 1px dashed #000;">
+                <p class="text-center small">Terima Kasih Atas Kunjungan Anda</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="window.location.reload()">Selesai & Baru</button>
+                <button type="button" class="btn btn-primary" onclick="printNota()">
+                    <i class="fas fa-print"></i> Cetak Nota
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %} {% block scripts %} 
+<script>
+// --- GLOBAL VARIABLES ---
+let cart = [];
+let allProducts = [];
+
+// --- 1. INISIALISASI ---
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('barcodeInput').focus();
+});
+
+// Shortcut F2 untuk buka cari manual
+document.addEventListener('keydown', function(e) {
+    if (e.key === "F2") {
+        e.preventDefault();
+        $('#modalCariBarang').modal('show');
+    }
+});
+
+// --- 2. LOGIKA BARCODE SCANNER ---
+document.getElementById('barcodeInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        const sku = this.value.trim();
+        if (sku) {
+            addToCart(sku);
+            this.value = ''; 
+        }
+    }
+});
+
+// --- 3. LOGIKA KERANJANG ---
+function addToCart(sku) {
+    fetch(`/inventory/get_by_sku/${sku}`)
+    .then(res => {
+        if (!res.ok) throw new Error('Produk tidak ditemukan');
+        return res.json();
+    })
+    .then(product => {
+        if(product.error) {
+            alert("Barang tidak ditemukan!");
+            return;
+        }
+
+        // Cek Stok sebelum tambah
+        if (product.stok <= 0) {
+            alert("Stok Habis!");
+            return;
+        }
+
+        const existing = cart.find(item => item.id === product.id);
+        if (existing) {
+            existing.qty += 1;
+        } else {
+            cart.push({
+                id: product.id,
+                sku: product.sku,
+                nama: product.nama_barang,
+                harga: product.harga_jual,
+                qty: 1
+            });
+        }
+        renderCart();
+    })
+    .catch(err => console.error(err));
+}
+function renderCart() {
+    const tbody = document.getElementById('cartTable');
+    const emptyMsg = document.getElementById('cartEmptyMsg');
+    if (cart.length === 0) {
+        emptyMsg.style.display = 'block';
+    } else {
+        emptyMsg.style.display = 'none';
+    }
+    tbody.innerHTML = '';
+    let grandTotal = 0;
+
+    cart.forEach((item, index) => {
+        const subtotal = item.harga * item.qty;
+        grandTotal += subtotal;
+        
+        // Cek Otoritas Role Admin untuk input harga
+        let hargaColumn;
+        if ("{{ session.role }}" === "admin") {
+            hargaColumn = `<input type="number" value="${item.harga}" class="form-control form-control-sm" onchange="updateHarga(${index}, this.value)">`;
+        } else {
+            hargaColumn = `Rp ${item.harga.toLocaleString('id-ID')}`;
+        }
+
+        tbody.innerHTML += `
+            <tr>
+                <td><strong>${item.sku}</strong><br>${item.nama}</td>
+                <td>${hargaColumn}</td>
+                <td>
+                    <input type="number" min="1" value="${item.qty}" class="form-control form-control-sm" onchange="updateQty(${index}, this.value)">
+                </td>
+                <td>Rp ${subtotal.toLocaleString('id-ID')}</td>
+                <td><button class="btn btn-sm btn-danger" onclick="removeItem(${index})">&times;</button></td>
+            </tr>
+        `;
+    });
+
+    document.getElementById('grandTotalDisplay').innerText = `Rp ${grandTotal.toLocaleString('id-ID')}`;
+    document.getElementById('cartDataInput').value = JSON.stringify(cart);
+    calculateChange();
+}
+
+// Tambahkan fungsi baru untuk update harga (Khusus Admin)
+function updateHarga(index, val) {
+    cart[index].harga = parseFloat(val) || 0;
+    renderCart();
+}
+// function renderCart() {
+//     const tbody = document.getElementById('cartTable');
+//     const emptyMsg = document.getElementById('cartEmptyMsg');
+//     tbody.innerHTML = '';
+//     let grandTotal = 0;
+
+//     if (cart.length === 0) {
+//         emptyMsg.style.display = 'block';
+//     } else {
+//         emptyMsg.style.display = 'none';
+//     }
+
+//     cart.forEach((item, index) => {
+//         const subtotal = item.harga * item.qty;
+//         grandTotal += subtotal;
+        
+//         tbody.innerHTML += `
+//             <tr class="animated fadeIn">
+//                 <td><small class="text-muted d-block">${item.sku}</small><strong>${item.nama}</strong></td>
+//                 <td>Rp ${item.harga.toLocaleString('id-ID')}</td>
+//                 <td>
+//                     <input type="number" min="1" value="${item.qty}" 
+//                            class="form-control form-control-sm" 
+//                            onchange="updateQty(${index}, this.value)">
+//                 </td>
+//                 <td class="font-weight-bold">Rp ${subtotal.toLocaleString('id-ID')}</td>
+//                 <td>
+//                     <button class="btn btn-sm btn-link text-danger" onclick="removeItem(${index})">
+//                         <i class="fas fa-trash"></i>
+//                     </button>
+//                 </td>
+//             </tr>
+//         `; 
+//     });
+
+//     document.getElementById('grandTotalDisplay').innerText = `Rp ${grandTotal.toLocaleString('id-ID')}`;
+//     document.getElementById('cartDataInput').value = JSON.stringify(cart);
+//     calculateChange();
+// }
+
+function updateQty(index, val) {
+    let newQty = parseInt(val) || 1;
+    let product = cart[index];
+
+    // Request ke server untuk cek stok terbaru sebelum update qty
+    fetch(`/inventory/get_by_sku/${product.sku}`)
+    .then(res => res.json())
+    .then(data => {
+        if (newQty > data.stok) {
+            alert(`Stok tidak mencukupi! Sisa stok saat ini: ${data.stok}`);
+            renderCart(); // Reset tampilan ke qty sebelumnya
+        } else {
+            cart[index].qty = newQty;
+            renderCart();
+        }
+    });
+}
+function removeItem(index) {
+    cart.splice(index, 1);
+    renderCart();
+}
+
+// --- 4. LOGIKA PEMBAYARAN ---
+document.getElementById('bayarInput').addEventListener('input', calculateChange);
+
+function calculateChange() {
+    const total = cart.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+    const bayar = parseFloat(document.getElementById('bayarInput').value) || 0;
+    const kembali = bayar - total;
+    
+    const displayKembali = document.getElementById('kembalianDisplay');
+    displayKembali.innerText = `Rp ${kembali.toLocaleString('id-ID')}`;
+
+    const btnSelesai = document.getElementById('btnSelesai');
+    if (kembali >= 0 && cart.length > 0) {
+        btnSelesai.disabled = false;
+        displayKembali.classList.remove('text-danger');
+        displayKembali.classList.add('text-success');
+    } else {
+        btnSelesai.disabled = true;
+        displayKembali.classList.remove('text-success');
+        displayKembali.classList.add('text-danger');
+    }
+}
+
+// --- 5. LOGIKA MODAL CARI MANUAL ---
+// Load data barang saat modal dibuka
+$('#modalCariBarang').on('shown.bs.modal', function () {
+    console.log("Memanggil data produk..."); // Cek di Console Browser (F12)
+    const searchTable = document.getElementById('manualSearchTable');
+    searchTable.innerHTML = '<tr><td colspan="5" class="text-center">Memuat data...</td></tr>';
+    
+    fetch('/inventory/get_all_json')
+    .then(res => {
+        if (!res.ok) throw new Error('Gagal memanggil API');
+        return res.json();
+    })
+    .then(data => {
+        allProducts = data; // Pastikan variabel global allProducts sudah dideklarasikan di awal script
+        displayManualSearch(data);
+        document.getElementById('manualSearchInput').focus();
+    })
+    .catch(err => {
+        console.error("Error Fetch:", err);
+        searchTable.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Gagal mengambil data: ${err.message}</td></tr>`;
+    });
+});
+
+// Fungsi menampilkan data ke tabel modal
+function displayManualSearch(products) {
+    const searchTable = document.getElementById('manualSearchTable');
+    searchTable.innerHTML = '';
+    
+    if (products.length === 0) {
+        searchTable.innerHTML = '<tr><td colspan="5" class="text-center">Tidak ada produk tersedia</td></tr>';
+        return;
+    }
+
+    products.forEach(p => {
+        searchTable.innerHTML += `
+            <tr>
+                <td><code>${p.sku}</code></td>
+                <td>${p.nama_barang}</td>
+                <td><span class="badge badge-secondary">${p.stok}</span></td>
+                <td>Rp ${p.harga_jual.toLocaleString('id-ID')}</td>
+                <td>
+                    <button class="btn btn-sm btn-success" onclick="selectProduct('${p.sku}')">
+                        Pilih
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+
+
+document.getElementById('manualSearchInput').addEventListener('keyup', function() {
+    const term = this.value.toLowerCase();
+    const filtered = allProducts.filter(p => 
+        p.nama_barang.toLowerCase().includes(term) || 
+        p.sku.toLowerCase().includes(term)
+    );
+    displayManualSearch(filtered);
+});
+
+function selectProduct(sku) {
+    addToCart(sku);
+    $('#modalCariBarang').modal('hide');
+    // Balikkan fokus ke barcode agar bisa langsung scan lagi
+    setTimeout(() => {
+        document.getElementById('barcodeInput').focus();
+    }, 500);
+}
+
+
+// Ganti event submit form checkout
+document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Jangan refresh halaman dulu
+    
+    const formData = new FormData(this);
+    
+    fetch('/kasir/checkout', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === 'success') {
+            showNota(data);
+        } else {
+            alert("Gagal: " + data.message);
+        }
+    });
+});
+
+function showNota(data) {
+    document.getElementById('notaInvoice').innerText = data.invoice;
+    document.getElementById('notaWaktu').innerText = data.waktu;
+    document.getElementById('notaKasir').innerText = data.kasir;
+    
+    let htmlItems = '';
+    data.items.forEach(item => {
+        htmlItems += `
+            <tr>
+                <td>${item.nama}<br>${item.qty} x ${item.harga.toLocaleString('id-ID')}</td>
+                <td class="text-right">Rp ${(item.qty * item.harga).toLocaleString('id-ID')}</td>
+            </tr>
+        `;
+    });
+    
+    document.getElementById('notaItems').innerHTML = htmlItems;
+    document.getElementById('notaTotal').innerText = `Rp ${data.total.toLocaleString('id-ID')}`;
+    document.getElementById('notaBayar').innerText = `Rp ${data.bayar.toLocaleString('id-ID')}`;
+    document.getElementById('notaKembali').innerText = `Rp ${data.kembali.toLocaleString('id-ID')}`;
+    
+    $('#modalNota').modal('show');
+}
+
+function printNota() {
+    const content = document.getElementById('areaCetakNota').innerHTML;
+    const win = window.open('', '', 'height=600,width=400');
+    win.document.write('<html><head><title>Print Nota</title>');
+    win.document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">');
+    win.document.write('<style>body{width: 80mm; padding: 10px; font-family: monospace;} @media print { .btn {display:none;} }</style>');
+    win.document.write('</head><body>');
+    win.document.write(content);
+    win.document.write('</body></html>');
+    
+    setTimeout(() => {
+        win.print();
+        win.close();
+    }, 500);
+}
+</script>
+
+{% endblock %}

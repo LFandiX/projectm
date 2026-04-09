@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}StudyAI{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #0d0d0f;
+      --paper: #f6f4ef;
+      --accent: #4f46e5;
+      --accent2: #06b6d4;
+      --green: #10b981;
+      --warm: #f59e0b;
+      --rose: #f43f5e;
+      --muted: #6b7280;
+      --border: #e5e2db;
+      --card: #ffffff;
+      --sidebar-w: 248px;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; display: flex; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w); min-height: 100vh; background: var(--ink);
+      display: flex; flex-direction: column; padding: 1.75rem 1.1rem;
+      position: fixed; top: 0; left: 0; z-index: 100; overflow-y: auto;
+    }
+    .brand { display: flex; align-items: center; gap: 0.65rem; padding: 0 0.3rem; margin-bottom: 2.25rem; }
+    .brand-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+    .brand-name { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.15rem; color: #fff; letter-spacing: -0.02em; }
+    .nav-section { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #374151; padding: 0 0.5rem; margin-bottom: 0.4rem; }
+    .nav-group { margin-bottom: 1.5rem; }
+    .nav-item { display: flex; align-items: center; gap: 0.65rem; padding: 0.6rem 0.75rem; border-radius: 9px; cursor: pointer; color: #6b7280; font-size: 0.875rem; text-decoration: none; transition: all 0.15s; margin-bottom: 0.1rem; }
+    .nav-item:hover { background: rgba(255,255,255,0.06); color: #e5e7eb; }
+    .nav-item.active { background: rgba(79,70,229,0.18); color: #a5b4fc; font-weight: 500; }
+    .nav-icon { font-size: 0.95rem; width: 18px; text-align: center; flex-shrink: 0; }
+    .sidebar-footer { margin-top: auto; padding-top: 1rem; }
+    .user-card { display: flex; align-items: center; gap: 0.7rem; padding: 0.7rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 11px; margin-bottom: 0.6rem; }
+    .avatar { width: 34px; height: 34px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.75rem; color: #fff; flex-shrink: 0; }
+    .user-info { overflow: hidden; }
+    .user-name { font-size: 0.82rem; font-weight: 500; color: #e5e7eb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-plan { font-size: 0.68rem; color: #6b7280; }
+    .plan-pro { color: #a5b4fc !important; }
+    .logout-btn { display: flex; align-items: center; gap: 0.6rem; width: 100%; padding: 0.55rem 0.75rem; background: none; border: none; color: #6b7280; font-family: 'DM Sans', sans-serif; font-size: 0.84rem; cursor: pointer; border-radius: 8px; text-decoration: none; transition: all 0.15s; }
+    .logout-btn:hover { color: #f87171; background: rgba(239,68,68,0.08); }
+
+    /* ── MAIN ── */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 2rem; border-bottom: 1px solid var(--border); background: var(--paper); position: sticky; top: 0; z-index: 50; }
+    .page-title { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
+    .topbar-right { display: flex; align-items: center; gap: 0.75rem; }
+    .content { padding: 2rem; flex: 1; }
+
+    /* ── SHARED COMPONENTS ── */
+    .btn { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.65rem 1.25rem; border-radius: 9px; font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; transition: all 0.15s; letter-spacing: 0.01em; }
+    .btn-dark { background: var(--ink); color: #fff; }
+    .btn-dark:hover { background: #1c1c2b; transform: translateY(-1px); }
+    .btn-outline { background: transparent; color: var(--ink); border: 1.5px solid var(--border); }
+    .btn-outline:hover { background: var(--card); border-color: #c5c2bb; }
+    .btn-accent { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; }
+    .btn-accent:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-sm { padding: 0.45rem 0.9rem; font-size: 0.78rem; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+    .card-header { display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--border); }
+    .card-title { font-family: 'Syne', sans-serif; font-size: 0.92rem; font-weight: 700; color: var(--ink); }
+    .card-body { padding: 1.5rem; }
+
+    .badge { display: inline-flex; align-items: center; padding: 0.22rem 0.65rem; border-radius: 100px; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; }
+    .badge-blue { background: #ede9fe; color: #6d28d9; }
+    .badge-green { background: #d1fae5; color: #065f46; }
+    .badge-warm { background: #fef3c7; color: #92400e; }
+    .badge-gray { background: var(--paper); color: var(--muted); border: 1px solid var(--border); }
+
+    .empty-state { text-align: center; padding: 3rem 2rem; }
+    .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+    .empty-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--ink); margin-bottom: 0.4rem; }
+    .empty-desc { font-size: 0.85rem; color: var(--muted); }
+
+    .alert { padding: 0.85rem 1rem; border-radius: 10px; font-size: 0.85rem; margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 0.5rem; }
+    .alert-error { background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; }
+    .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+    .alert-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; }
+
+    /* API Key input */
+    .api-key-bar { display: flex; gap: 0.5rem; align-items: center; padding: 0.85rem 1.25rem; background: #fafaf8; border-bottom: 1px solid var(--border); }
+    .api-key-bar label { font-size: 0.78rem; font-weight: 600; color: var(--muted); white-space: nowrap; }
+    .api-key-bar input { flex: 1; padding: 0.5rem 0.85rem; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; background: var(--card); outline: none; min-width: 0; }
+    .api-key-bar input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+    .api-key-hint { font-size: 0.72rem; color: var(--muted); }
+
+    /* Material select */
+    .material-select { padding: 0.6rem 0.9rem; border: 1.5px solid var(--border); border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; background: var(--card); color: var(--ink); cursor: pointer; outline: none; }
+    .material-select:focus { border-color: var(--accent); }
+
+    /* Spinner */
+    .spinner { width: 20px; height: 20px; border: 2.5px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
+    .spinner-dark { border-color: rgba(79,70,229,0.2); border-top-color: var(--accent); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Animations */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.4s ease both; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .content { padding: 1.25rem; }
+    }
+  </style>
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-icon">🎓</div>
+    <span class="brand-name">StudyAI</span>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-section">Main</div>
+    <a href="{{ url_for('dashboard') }}" class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+      <span class="nav-icon">🏠</span> Dashboard
+    </a>
+    <a href="{{ url_for('materials') }}" class="nav-item {% if request.endpoint == 'materials' %}active{% endif %}">
+      <span class="nav-icon">📁</span> My Materials
+    </a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-section">AI Tools</div>
+    <a href="{{ url_for('summarizer') }}" class="nav-item {% if request.endpoint == 'summarizer' %}active{% endif %}">
+      <span class="nav-icon">📋</span> PDF Summarizer
+    </a>
+    <a href="{{ url_for('quiz') }}" class="nav-item {% if request.endpoint == 'quiz' %}active{% endif %}">
+      <span class="nav-icon">📝</span> Quiz Generator
+    </a>
+    <a href="{{ url_for('flashcards') }}" class="nav-item {% if request.endpoint == 'flashcards' %}active{% endif %}">
+      <span class="nav-icon">🃏</span> Flashcards
+    </a>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="avatar">{{ user_avatar }}</div>
+      <div class="user-info">
+        <div class="user-name">{{ user_name }}</div>
+        <div class="user-plan {% if user_plan == 'Pro' %}plan-pro{% endif %}">
+          {% if user_plan == 'Pro' %}✦ Pro Plan{% else %}Free Plan{% endif %}
+        </div>
+      </div>
+    </div>
+    <a href="{{ url_for('logout') }}" class="logout-btn">↩ Sign out</a>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="page-title">{% block page_title %}{% endblock %}</div>
+    <div class="topbar-right">{% block topbar_actions %}{% endblock %}</div>
+  </header>
+  <div class="content">{% block content %}{% endblock %}</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.uas.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_taskDetail"
+            app:destination="@id/taskDetail" />
+        <action
+            android:id="@+id/action_homeFragment_to_addTask"
+            app:destination="@id/addTask" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/taskDetail"
+        android:name="com.example.uas.TaskDetail"
+        android:label="fragment_task_detail"
+        tools:layout="@layout/fragment_task_detail" >
+        <argument
+            android:name="STATUS_FILTER"
+            app:argType="string"
+            android:defaultValue="New" />
+        <action
+            android:id="@+id/action_taskDetail_to_actionDetail"
+            app:destination="@id/actionDetail" />
+        <action
+            android:id="@+id/action_back"
+            app:destination="@id/homeFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addTask"
+        android:name="com.example.uas.AddTaskFragment"
+        android:label="fragment_add_task"
+        tools:layout="@layout/fragment_add_task" />
+    <fragment
+        android:id="@+id/actionDetail"
+        android:name="com.example.uas.ActionDetail"
+        android:label="fragment_action_detail"
+        tools:layout="@layout/fragment_action_detail" >
+        <argument
+            android:name="ARG_ID"
+            app:argType="integer" />
+        <argument
+            android:name="ARG_TITLE"
+            app:argType="string" />
+        <argument
+            android:name="ARG_DESC"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="ARG_CATEGORY"
+            app:argType="string" />
+        <argument
+            android:name="ARG_STATUS"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_back_to_taskDetail"
+            app:destination="@id/taskDetail" />
+    </fragment>
+</navigation>

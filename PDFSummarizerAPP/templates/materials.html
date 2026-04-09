@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}My Materials — StudyAI{% endblock %}
+{% block page_title %}My Materials{% endblock %}
+{% block topbar_actions %}
+<button class="btn btn-dark" onclick="document.getElementById('upload-modal').style.display='flex'">+ Upload PDF</button>
+{% endblock %}
+
+{% block head %}
+<style>
+  .mat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+  .mat-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.35rem; transition: all .2s; animation: fadeUp .4s ease both; }
+  .mat-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,.07); transform: translateY(-2px); }
+  .mc-top { display: flex; align-items: flex-start; gap: .85rem; margin-bottom: 1rem; }
+  .mc-icon { width: 42px; height: 42px; background: linear-gradient(135deg, #ede9fe, #dbeafe); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+  .mc-info { flex: 1; min-width: 0; }
+  .mc-name { font-weight: 500; font-size: .9rem; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: .25rem; }
+  .mc-date { font-size: .73rem; color: var(--muted); }
+  .mc-stats { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .mc-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if materials %}
+<div class="mat-grid">
+  {% for m in materials %}
+  <div class="mat-card" style="animation-delay: {{ loop.index0 * 0.05 }}s">
+    <div class="mc-top">
+      <div class="mc-icon">📄</div>
+      <div class="mc-info">
+        <div class="mc-name">{{ m.original_name }}</div>
+        <div class="mc-date">{{ m.uploaded_at }} · {{ m.word_count }} words</div>
+      </div>
+    </div>
+    <div class="mc-stats">
+      {% if m.summary %}<span class="badge badge-green">✓ Summary</span>{% else %}<span class="badge badge-gray">No summary</span>{% endif %}
+      {% if m.quiz %}<span class="badge badge-blue">{{ m.quiz|length }} quiz Qs</span>{% else %}<span class="badge badge-gray">No quiz</span>{% endif %}
+      {% if m.flashcards %}<span class="badge badge-warm">{{ m.flashcards|length }} cards</span>{% else %}<span class="badge badge-gray">No flashcards</span>{% endif %}
+    </div>
+    <div class="mc-actions">
+      <a href="{{ url_for('summarizer', id=m.id) }}" class="btn btn-outline btn-sm">📋 Summarize</a>
+      <a href="{{ url_for('quiz', id=m.id) }}" class="btn btn-outline btn-sm">📝 Quiz</a>
+      <a href="{{ url_for('flashcards', id=m.id) }}" class="btn btn-dark btn-sm">🃏 Cards</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card" style="margin-top:2rem">
+  <div class="empty-state">
+    <div class="empty-icon">📂</div>
+    <div class="empty-title">No materials uploaded yet</div>
+    <div class="empty-desc" style="margin-bottom:1.25rem">Upload a PDF to start using AI tools</div>
+    <button class="btn btn-dark" onclick="document.getElementById('upload-modal').style.display='flex'">+ Upload your first PDF</button>
+  </div>
+</div>
+{% endif %}
+
+<!-- Upload Modal (same as dashboard) -->
+<div class="modal-overlay" id="upload-modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Upload Study Material</span>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+      <div class="drop-icon">📄</div>
+      <div class="drop-title">Drop your PDF here</div>
+      <div class="drop-sub">or <span style="color:var(--accent);font-weight:500;cursor:pointer">browse files</span></div>
+    </div>
+    <input type="file" id="file-input" accept=".pdf" onchange="onFileSelect(event)" style="display:none"/>
+    <div id="file-selected" style="display:none;align-items:center;gap:.75rem;padding:.85rem 1rem;background:var(--paper);border-radius:10px;margin-top:1rem">
+      <span>📄</span><span id="file-sel-name" style="flex:1;font-size:.85rem;font-weight:500"></span><span id="file-sel-size" style="font-size:.75rem;color:var(--muted)"></span>
+    </div>
+    <div id="upload-progress" style="display:none;margin-top:1rem">
+      <div style="height:5px;background:var(--paper);border-radius:100px;overflow:hidden"><div id="progress-fill" style="height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%;transition:width .3s;border-radius:100px"></div></div>
+      <div id="upload-status" style="font-size:.8rem;color:var(--muted);margin-top:.5rem">Uploading...</div>
+    </div>
+    <div id="upload-alert"></div>
+    <div style="display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.5rem">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-dark" id="upload-btn" onclick="doUpload()" disabled>Upload →</button>
+    </div>
+  </div>
+</div>
+<style>
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+  .modal{background:var(--card);border-radius:18px;padding:2rem;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:fadeUp .3s ease}
+  .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem}
+  .modal-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--ink)}
+  .modal-close{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted);line-height:1;padding:.2rem}
+  .drop-zone{border:2px dashed var(--border);border-radius:12px;padding:2.5rem 1.5rem;text-align:center;cursor:pointer;transition:all .2s}
+  .drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:rgba(79,70,229,.04)}
+  .drop-icon{font-size:2.5rem;margin-bottom:.75rem}
+  .drop-title{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.3rem}
+  .drop-sub{font-size:.8rem;color:var(--muted)}
+</style>
+<script>
+let selectedFile=null;
+function closeModal(){document.getElementById('upload-modal').style.display='none';selectedFile=null;document.getElementById('file-selected').style.display='none';document.getElementById('upload-progress').style.display='none';document.getElementById('upload-btn').disabled=true;document.getElementById('upload-alert').innerHTML='';document.getElementById('file-input').value='';}
+function setFile(file){if(!file||!file.name.endsWith('.pdf')){document.getElementById('upload-alert').innerHTML='<div class="alert alert-error" style="margin-top:.75rem">Only PDF files are allowed.</div>';return;}selectedFile=file;document.getElementById('file-sel-name').textContent=file.name;document.getElementById('file-sel-size').textContent=(file.size/1024/1024).toFixed(2)+' MB';document.getElementById('file-selected').style.display='flex';document.getElementById('upload-btn').disabled=false;}
+function onFileSelect(e){setFile(e.target.files[0]);}
+function onDragOver(e){e.preventDefault();document.getElementById('drop-zone').classList.add('drag-over');}
+function onDragLeave(e){document.getElementById('drop-zone').classList.remove('drag-over');}
+function onDrop(e){e.preventDefault();document.getElementById('drop-zone').classList.remove('drag-over');setFile(e.dataTransfer.files[0]);}
+async function doUpload(){if(!selectedFile)return;const btn=document.getElementById('upload-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';document.getElementById('upload-progress').style.display='block';const fill=document.getElementById('progress-fill');fill.style.width='70%';const fd=new FormData();fd.append('file',selectedFile);try{const res=await fetch('/upload',{method:'POST',body:fd});const data=await res.json();fill.style.width='100%';if(data.success){document.getElementById('upload-alert').innerHTML='<div class="alert alert-success" style="margin-top:.75rem">✓ Uploaded!</div>';setTimeout(()=>{closeModal();location.reload();},1200);}else{document.getElementById('upload-alert').innerHTML=`<div class="alert alert-error" style="margin-top:.75rem">${data.error}</div>`;btn.disabled=false;btn.innerHTML='Upload →';fill.style.width='0%';}}catch(e){document.getElementById('upload-alert').innerHTML='<div class="alert alert-error" style="margin-top:.75rem">Network error.</div>';btn.disabled=false;btn.innerHTML='Upload →';}}
+</script>
+{% endblock %}

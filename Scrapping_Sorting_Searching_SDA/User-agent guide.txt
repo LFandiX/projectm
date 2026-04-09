@@ -1,0 +1,2 @@
+change the user-agent value based on your web browser
+can be found by search "My user agent" in browser

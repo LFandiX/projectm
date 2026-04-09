@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Toko Digital</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            transition: all 0.3s;
+        }
+
+        /* Sidebar Tetap di Kiri (Fixed) */
+        #sidebar-wrapper {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 250px;
+            background: #343a40;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+            /* Jika menu sangat banyak, sidebar bisa di-scroll sendiri */
+        }
+
+        /* Styling Isi Sidebar */
+        #sidebar-wrapper .sidebar-heading {
+            padding: 1.5rem;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: #212529;
+        }
+
+        #sidebar-wrapper .list-group-item {
+            background: transparent;
+            color: #adb5bd;
+            border: none;
+            padding: 1rem 1.5rem;
+        }
+
+        #sidebar-wrapper .list-group-item:hover {
+            background: #495057;
+            color: white;
+        }
+
+        /* Area Konten Harus Bergeser 250px ke Kanan */
+        #page-content-wrapper {
+            width: 100%;
+            padding-left: 250px;
+            /* Jarak agar konten tidak tertutup sidebar */
+            transition: all 0.3s ease;
+        }
+
+        /* Kondisi Saat Sidebar Ditutup (Toggled) */
+        #wrapper.toggled #sidebar-wrapper {
+            left: -250px;
+        }
+
+        #wrapper.toggled #page-content-wrapper {
+            padding-left: 0;
+        }
+
+        /* Navbar Custom */
+        .navbar-custom {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 10px 20px;
+            position: sticky;
+            /* Navbar atas juga tetap di atas saat scroll */
+            top: 0;
+            z-index: 999;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="wrapper">
+        <div id="sidebar-wrapper">
+            <div class="sidebar-heading border-bottom">TOKO DIGITAL</div>
+            <div class="list-group list-group-flush">
+                <a href="/" class="list-group-item list-group-item-action"><i class="fas fa-tachometer-alt mr-2"></i>
+                    Dashboard</a>
+                <a href="/inventory" class="list-group-item list-group-item-action"><i class="fas fa-boxes mr-2"></i>
+                    Inventori</a>
+                <a href="/kasir" class="list-group-item list-group-item-action"><i
+                        class="fas fa-cash-register mr-2"></i> Kasir</a>
+                <a href="/transactions" class="list-group-item list-group-item-action">
+                    <i class="fas fa-history mr-2"></i> Riwayat Transaksi
+                </a>
+                <a href="/inventory/adjustment-history" class="list-group-item list-group-item-action">
+                    <i class="fas fa-history mr-2"></i> Log Stok Manual
+                </a>
+                {% if session.get('role') == 'admin' %}
+                <a href="/users" class="list-group-item list-group-item-action">
+                    <i class="fas fa-user-shield mr-2"></i> Manajemen User
+                </a>
+        
+                <a href="/settings/database" class="list-group-item list-group-item-action">
+                    <i class="fas fa-file-export mr-2"></i> Laporan & Backup
+                </a>
+                {% endif %}
+
+
+                <div class="mt-auto"></div>
+
+                <a href="/logout" class="list-group-item list-group-item-action text-danger border-top">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                </a>
+            </div>
+        </div>
+
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg navbar-light navbar-custom">
+                <button class="btn btn-outline-dark" id="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="ml-auto text-muted">{{user}}</div>
+            </nav>
+
+            <div class="container-fluid mt-4">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Script untuk Toggle Sidebar
+        $("#menu-toggle").click(function (e) {
+            e.preventDefault();
+            $("#wrapper").toggleClass("toggled");
+        });
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

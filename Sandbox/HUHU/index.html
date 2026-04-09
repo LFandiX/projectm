@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cryptography Challenge</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🔐 Cryptography Challenge</h1>
+    <div id="challenge-box">
+      <h2 id="level-title">Level 1: Caesar Cipher</h2>
+      <p id="cipher-text">Khoor Zruog</p>
+      <input type="text" id="answer" placeholder="Masukkan plaintext...">
+      <button onclick="checkAnswer()">Submit</button>
+      <p id="hint">Hint: Shift 3</p>
+      <p id="feedback"></p>
+    </div>
+    <div id="score">Score: 0</div>
+    <div id="timer">Time Left: 60s</div>
+    <div id="leaderboard">
+      <h3>Leaderboard</h3>
+      <ul id="leaderboard-list"></ul>
+    </div>
+  </div>
+<script>
+let currentLevel = 1;
+let score = 0;
+let timeLeft = 60;
+let timer;
+const levels = [
+  {title: 'Level 1: Caesar Cipher', cipher: 'Khoor Zruog', answer: 'Hello World', hint: 'Shift 3'},
+  {title: 'Level 2: Vigenère Cipher', cipher: 'Lxfopv Ef rnhr', answer: 'Attack At dawn', hint: 'Key: LEMON'},
+  {title: 'Level 3: XOR Cipher', cipher: 'Mjqqt1Btwqi', answer: 'Hello World', hint: 'XOR key: 5'},
+  {title: 'Level 4: RSA Cipher', cipher: 'Encrypted RSA Msg', answer: 'RSASolved', hint: 'Decrypt RSA'},
+  {title: 'Level 5: AES Cipher', cipher: 'Encrypted AES Msg', answer: 'AESSolved', hint: 'Decrypt AES'}
+];
+
+function startTimer() {
+  timer = setInterval(() => {
+    timeLeft--;
+    document.getElementById('timer').textContent = `Time Left: ${timeLeft}s`;
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      alert('Waktu habis! Skor Anda: ' + score);
+      saveLeaderboard(score);
+      resetGame();
+    }
+  }, 1000);
+}
+
+function checkAnswer() {
+  const userAnswer = document.getElementById('answer').value.trim();
+  const levelData = levels[currentLevel - 1];
+
+  if (userAnswer.toLowerCase() === levelData.answer.toLowerCase()) {
+    score += 20;
+    document.getElementById('score').textContent = `Score: ${score}`;
+    document.getElementById('feedback').textContent = '✅ Benar!';
+    nextLevel();
+  } else {
+    document.getElementById('feedback').textContent = '❌ Salah, coba lagi!';
+  }
+}
+
+function nextLevel() {
+  if (currentLevel < levels.length) {
+    currentLevel++;
+    const levelData = levels[currentLevel - 1];
+    document.getElementById('level-title').textContent = levelData.title;
+    document.getElementById('cipher-text').textContent = levelData.cipher;
+    document.getElementById('hint').textContent = 'Hint: ' + levelData.hint;
+    document.getElementById('answer').value = '';
+  } else {
+    clearInterval(timer);
+    alert('🎉 Selamat! Semua level selesai. Skor Anda: ' + score);
+    saveLeaderboard(score);
+    resetGame();
+  }
+}
+
+function saveLeaderboard(finalScore) {
+  let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+  leaderboard.push({score: finalScore, date: new Date().toLocaleString()});
+  leaderboard.sort((a,b) => b.score - a.score);
+  localStorage.setItem('leaderboard', JSON.stringify(leaderboard.slice(0,5)));
+  displayLeaderboard();
+}
+
+function displayLeaderboard() {
+  let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+  const list = document.getElementById('leaderboard-list');
+  list.innerHTML = '';
+  leaderboard.forEach(item => {
+    const li = document.createElement('li');
+    li.textContent = `${item.score} points - ${item.date}`;
+    list.appendChild(li);
+  });
+}
+
+function resetGame() {
+  currentLevel = 1;
+  score = 0;
+  timeLeft = 60;
+  document.getElementById('score').textContent = 'Score: 0';
+  const levelData = levels[0];
+  document.getElementById('level-title').textContent = levelData.title;
+  document.getElementById('cipher-text').textContent = levelData.cipher;
+  document.getElementById('hint').textContent = 'Hint: ' + levelData.hint;
+  document.getElementById('answer').value = '';
+  startTimer();
+}
+
+displayLeaderboard();
+startTimer();
+</script>
+</body>
+</html>

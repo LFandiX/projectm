@@ -1,0 +1,5 @@
+Theo Greyjoy,DOC001,Neurolog,33000,10,Surgery
+Frits Starkk,DOC002,THT,25000,110,CheckUp
+Arman Baratheon,DOC003,Dermatolog,32000,5,Treatment
+Darren Targaryen,DOC004,Odontologi,18500,3,CheckUp
+Ruben Lannister,DOC005,Psikiatri,-20000,15,Treatment

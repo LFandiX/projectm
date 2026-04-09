@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="top"
+    tools:context=".ResultActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="16dp"
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        android:text="About Author"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/profileImage"
+            android:layout_width="147dp"
+            android:layout_height="120dp"
+            android:contentDescription="Foto Profil"
+            android:scaleType="centerCrop"
+            android:src="@drawable/alfandi_wijaya"
+            android:rotation="90"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/nameText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nama: Alfandi Wijaya"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:paddingBottom="8dp" />
+            <TextView
+                android:id="@+id/nimText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NIM: 232200156"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:paddingBottom="8dp" />
+
+            <TextView
+                android:id="@+id/descText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Prodi: IBDA 2023"
+                android:textSize="16sp"
+                android:textColor="@android:color/darker_gray"
+                android:paddingBottom="8dp" />
+
+            <TextView
+                android:id="@+id/hobbyText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mahasiswa di Calvin Institute of Technology"
+                android:textSize="16sp"
+                android:textColor="@android:color/darker_gray" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:text="Quiz App adalah aplikasi kuis interaktif sederhana yang dirancang untuk mengasah kemampuan berpikir cepat dan logika pengguna. Dalam setiap pertanyaan, pengguna akan diberikan pernyataan seperti “2 + 2 = 4?” dan harus memilih antara TRUE atau FALSE."
+        android:textSize="15sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <Button
+        android:id="@+id/btn_bck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:textSize="20sp"
+        android:layout_gravity="end"
+        android:text="Back"/>
+
+</LinearLayout>

@@ -1,0 +1,4 @@
+SUR001,Mohs,2500
+SUR002,Craniotomy,22000
+SUR003,Extended Bifrontal,25000
+SUR004,Tonsilektomi,4000

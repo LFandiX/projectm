@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tambahkan ini saja untuk reset */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f1f5f9; /* Warna slate-100 agar konsisten */
+}

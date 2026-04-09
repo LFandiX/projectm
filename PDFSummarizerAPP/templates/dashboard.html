@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — StudyAI{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block topbar_actions %}
+<button class="btn btn-dark" onclick="document.getElementById('upload-modal').style.display='flex'">
+  + Upload PDF
+</button>
+{% endblock %}
+
+{% block head %}
+<style>
+  .greeting { margin-bottom: 1.75rem; }
+  .greeting h1 { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--ink); letter-spacing: -.03em; margin-bottom: .3rem; }
+  .greeting p { color: var(--muted); font-size: .875rem; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; margin-bottom: 1.75rem; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem 1.4rem; position: relative; overflow: hidden; transition: all .2s; animation: fadeUp .4s ease both; }
+  .stat-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,.07); transform: translateY(-2px); }
+  .stat-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .sc1::after { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+  .sc2::after { background: linear-gradient(90deg, var(--green), #34d399); }
+  .sc3::after { background: linear-gradient(90deg, var(--warm), #fbbf24); }
+  .sc4::after { background: linear-gradient(90deg, #ec4899, #f472b6); }
+  .stat-card:nth-child(1){animation-delay:.05s} .stat-card:nth-child(2){animation-delay:.1s}
+  .stat-card:nth-child(3){animation-delay:.15s} .stat-card:nth-child(4){animation-delay:.2s}
+  .stat-icon { font-size: 1.3rem; margin-bottom: .75rem; }
+  .stat-num { font-family: 'Syne', sans-serif; font-size: 1.9rem; font-weight: 800; color: var(--ink); letter-spacing: -.04em; line-height: 1; margin-bottom: .25rem; }
+  .stat-label { font-size: .78rem; color: var(--muted); }
+
+  .main-grid { display: grid; grid-template-columns: 1fr 300px; gap: 1.25rem; }
+
+  /* Materials list */
+  .mat-row { display: flex; align-items: center; gap: .85rem; padding: .9rem 1.4rem; border-bottom: 1px solid #f9f8f6; transition: background .15s; }
+  .mat-row:last-child { border-bottom: none; }
+  .mat-row:hover { background: #fafaf9; }
+  .mat-icon { width: 36px; height: 36px; background: var(--paper); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+  .mat-info { flex: 1; min-width: 0; }
+  .mat-name { font-size: .875rem; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: .15rem; }
+  .mat-meta { font-size: .73rem; color: var(--muted); }
+  .mat-actions { display: flex; gap: .4rem; flex-shrink: 0; }
+
+  /* Quick actions */
+  .qa-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; padding: 1.25rem; }
+  .qa-btn { display: flex; flex-direction: column; align-items: center; gap: .5rem; padding: 1rem .75rem; background: var(--paper); border: 1px solid var(--border); border-radius: 11px; cursor: pointer; text-decoration: none; transition: all .15s; }
+  .qa-btn:hover { background: #eeecea; border-color: #c9c5be; transform: translateY(-1px); }
+  .qa-icon { font-size: 1.4rem; }
+  .qa-label { font-size: .78rem; font-weight: 500; color: var(--ink); text-align: center; }
+
+  /* Upload modal */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+  .modal { background: var(--card); border-radius: 18px; padding: 2rem; width: 100%; max-width: 460px; box-shadow: 0 20px 60px rgba(0,0,0,.2); animation: fadeUp .3s ease; }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+  .modal-title { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--ink); }
+  .modal-close { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--muted); line-height: 1; padding: .2rem; }
+  .drop-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 2.5rem 1.5rem; text-align: center; cursor: pointer; transition: all .2s; }
+  .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); background: rgba(79,70,229,.04); }
+  .drop-icon { font-size: 2.5rem; margin-bottom: .75rem; }
+  .drop-title { font-family: 'Syne', sans-serif; font-size: .95rem; font-weight: 700; color: var(--ink); margin-bottom: .3rem; }
+  .drop-sub { font-size: .8rem; color: var(--muted); }
+  .drop-sub span { color: var(--accent); font-weight: 500; cursor: pointer; }
+  #file-input { display: none; }
+  .file-selected { display: none; align-items: center; gap: .75rem; padding: .85rem 1rem; background: var(--paper); border-radius: 10px; margin-top: 1rem; }
+  .file-selected.show { display: flex; }
+  .file-sel-icon { font-size: 1.3rem; }
+  .file-sel-name { flex: 1; font-size: .85rem; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .file-sel-size { font-size: .75rem; color: var(--muted); }
+  .upload-progress { display: none; margin-top: 1rem; }
+  .progress-bar { height: 5px; background: var(--paper); border-radius: 100px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); width: 0%; transition: width .3s ease; border-radius: 100px; }
+  .upload-status { font-size: .8rem; color: var(--muted); margin-top: .5rem; }
+  .modal-footer { display: flex; justify-content: flex-end; gap: .75rem; margin-top: 1.5rem; }
+
+  @media(max-width:1100px){.stats-grid{grid-template-columns:repeat(2,1fr)}.main-grid{grid-template-columns:1fr}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="greeting fade-up">
+  <h1>Hey, {{ user_name.split()[0] }} 👋</h1>
+  <p>Here's your study overview. Upload a PDF to get started.</p>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid">
+  <div class="stat-card sc1"><div class="stat-icon">📁</div><div class="stat-num">{{ stats.uploads }}</div><div class="stat-label">Materials uploaded</div></div>
+  <div class="stat-card sc2"><div class="stat-icon">📋</div><div class="stat-num">{{ stats.summaries }}</div><div class="stat-label">Summaries generated</div></div>
+  <div class="stat-card sc3"><div class="stat-icon">📝</div><div class="stat-num">{{ stats.quizzes }}</div><div class="stat-label">Quiz questions</div></div>
+  <div class="stat-card sc4"><div class="stat-icon">🃏</div><div class="stat-num">{{ stats.flashcards }}</div><div class="stat-label">Flashcards created</div></div>
+</div>
+
+<div class="main-grid">
+  <!-- Recent materials -->
+  <div class="card fade-up" style="animation-delay:.25s">
+    <div class="card-header">
+      <span class="card-title">Recent Materials</span>
+      <a href="{{ url_for('materials') }}" class="btn btn-outline btn-sm">View all</a>
+    </div>
+    {% if materials %}
+      {% for m in materials %}
+      <div class="mat-row">
+        <div class="mat-icon">📄</div>
+        <div class="mat-info">
+          <div class="mat-name">{{ m.original_name }}</div>
+          <div class="mat-meta">{{ m.uploaded_at }} · {{ m.word_count }} words</div>
+        </div>
+        {% if m.summary %}<span class="badge badge-green">Summarized</span>{% endif %}
+        {% if m.quiz %}<span class="badge badge-blue">{{ m.quiz|length }} Q</span>{% endif %}
+        <div class="mat-actions">
+          <a href="{{ url_for('summarizer', id=m.id) }}" class="btn btn-outline btn-sm">Summarize</a>
+          <a href="{{ url_for('quiz', id=m.id) }}" class="btn btn-dark btn-sm">Quiz</a>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">📂</div>
+        <div class="empty-title">No materials yet</div>
+        <div class="empty-desc">Upload your first PDF to get started</div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Right col -->
+  <div style="display:flex;flex-direction:column;gap:1.25rem">
+    <div class="card fade-up" style="animation-delay:.3s">
+      <div class="card-header"><span class="card-title">Quick Actions</span></div>
+      <div class="qa-grid">
+        <a href="{{ url_for('summarizer') }}" class="qa-btn"><span class="qa-icon">📋</span><span class="qa-label">Summarize</span></a>
+        <a href="{{ url_for('quiz') }}" class="qa-btn"><span class="qa-icon">📝</span><span class="qa-label">Generate Quiz</span></a>
+        <a href="{{ url_for('flashcards') }}" class="qa-btn"><span class="qa-icon">🃏</span><span class="qa-label">Flashcards</span></a>
+        <a href="{{ url_for('materials') }}" class="qa-btn"><span class="qa-icon">📁</span><span class="qa-label">All Files</span></a>
+      </div>
+    </div>
+    {% if user_plan != 'Pro' %}
+    <div class="card fade-up" style="animation-delay:.35s;overflow:visible">
+      <div class="card-body" style="background:var(--ink);border-radius:13px;position:relative;overflow:hidden">
+        <div style="position:absolute;width:180px;height:180px;background:radial-gradient(circle,rgba(79,70,229,.4) 0%,transparent 70%);top:-50px;right:-50px;pointer-events:none"></div>
+        <div style="font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:#fff;margin-bottom:.4rem;position:relative">Upgrade to Pro ✦</div>
+        <div style="font-size:.8rem;color:#9ca3af;margin-bottom:1rem;position:relative;line-height:1.5">Unlimited uploads + all AI features for $5/month.</div>
+        <a href="#" class="btn btn-accent" style="width:100%;justify-content:center;position:relative">Upgrade now →</a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal-overlay" id="upload-modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Upload Study Material</span>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+      <div class="drop-icon">📄</div>
+      <div class="drop-title">Drop your PDF here</div>
+      <div class="drop-sub">or <span>browse files</span> to upload</div>
+    </div>
+    <input type="file" id="file-input" accept=".pdf" onchange="onFileSelect(event)"/>
+    <div class="file-selected" id="file-selected">
+      <span class="file-sel-icon">📄</span>
+      <span class="file-sel-name" id="file-sel-name"></span>
+      <span class="file-sel-size" id="file-sel-size"></span>
+    </div>
+    <div class="upload-progress" id="upload-progress">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="upload-status" id="upload-status">Uploading...</div>
+    </div>
+    <div id="upload-alert"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-dark" id="upload-btn" onclick="doUpload()" disabled>Upload →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedFile = null;
+
+function closeModal() {
+  document.getElementById('upload-modal').style.display = 'none';
+  selectedFile = null;
+  document.getElementById('file-selected').classList.remove('show');
+  document.getElementById('upload-progress').style.display = 'none';
+  document.getElementById('upload-btn').disabled = true;
+  document.getElementById('upload-alert').innerHTML = '';
+  document.getElementById('file-input').value = '';
+}
+
+function setFile(file) {
+  if (!file || !file.name.endsWith('.pdf')) {
+    showAlert('Only PDF files are allowed.', 'error'); return;
+  }
+  selectedFile = file;
+  document.getElementById('file-sel-name').textContent = file.name;
+  document.getElementById('file-sel-size').textContent = (file.size/1024/1024).toFixed(2)+' MB';
+  document.getElementById('file-selected').classList.add('show');
+  document.getElementById('upload-btn').disabled = false;
+}
+
+function onFileSelect(e) { setFile(e.target.files[0]); }
+function onDragOver(e) { e.preventDefault(); document.getElementById('drop-zone').classList.add('drag-over'); }
+function onDragLeave(e) { document.getElementById('drop-zone').classList.remove('drag-over'); }
+function onDrop(e) { e.preventDefault(); document.getElementById('drop-zone').classList.remove('drag-over'); setFile(e.dataTransfer.files[0]); }
+
+function showAlert(msg, type) {
+  document.getElementById('upload-alert').innerHTML = `<div class="alert alert-${type === 'error' ? 'error' : 'success'}" style="margin-top:.75rem">${msg}</div>`;
+}
+
+async function doUpload() {
+  if (!selectedFile) return;
+  const btn = document.getElementById('upload-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+  document.getElementById('upload-progress').style.display = 'block';
+  document.getElementById('upload-alert').innerHTML = '';
+
+  const fill = document.getElementById('progress-fill');
+  const status = document.getElementById('upload-status');
+  fill.style.width = '30%'; status.textContent = 'Uploading...';
+
+  const fd = new FormData();
+  fd.append('file', selectedFile);
+  try {
+    fill.style.width = '70%'; status.textContent = 'Processing PDF...';
+    const res = await fetch('/upload', { method: 'POST', body: fd });
+    const data = await res.json();
+    fill.style.width = '100%';
+    if (data.success) {
+      status.textContent = 'Done!';
+      showAlert(`✓ "${data.name}" uploaded successfully (${data.word_count.toLocaleString()} words)`, 'success');
+      btn.innerHTML = '✓ Uploaded';
+      setTimeout(() => { closeModal(); location.reload(); }, 1500);
+    } else {
+      showAlert(data.error || 'Upload failed', 'error');
+      btn.disabled = false; btn.innerHTML = 'Upload →';
+      fill.style.width = '0%';
+    }
+  } catch(e) {
+    showAlert('Network error. Try again.', 'error');
+    btn.disabled = false; btn.innerHTML = 'Upload →';
+  }
+}
+</script>
+{% endblock %}

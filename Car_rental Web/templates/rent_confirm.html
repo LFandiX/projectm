@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width= , initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="text-gray-600">
+    <div>
+      <!--  content wraper -->
+      <div>
+        <nav class="bg-gray-200">
+          <div class="flex justify-between">
+            <div class="flex place-items-center">
+              <h1 class="font-bold uppercase p-4 border-b border-gray-100">
+                <a href="/">SEWANITY</a>
+              </h1>
+              <ul class="flex">
+                <li class="text-gray-700 font-bold ml-2">
+                  <a href="/home">
+                    <span>Home</span>
+                  </a>
+                </li>
+                <li class="text-gray-700 font-bold ml-2">
+                  <a href="/about-us">
+                    <span>About</span>
+                  </a>
+                </li>
+                <li class="text-gray-700 font-bold ml-2">
+                  <a href="/contact">
+                    <span>Contact</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {% if session_user != None %}
+            <div class="flex place-items-center mr-5">
+              <a class="text-red-600 ml-2" href="/logout">Log out</a>
+            </div>
+            {%else%}
+            <div
+              class="flex justify-center md:justify-end place-items-center mr-7"
+            >
+              <a class="text-red-600 ml-2" href="/login">Log in</a>
+              <a class="text-red-600 ml-2" href="/register">Sign up</a>
+            </div>
+            {%endif%}
+          </div>
+        </nav>
+      </div>
+      <!-- form -->
+
+      <form class="max-w-sm mx-auto" method="POST">
+        <div class="w-90 flex items-center gap-4">
+          <label for="birthday" class="w-32">Submission Date:</label>
+          <input
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            type="date"
+            id="start_date"
+            name="start_date"
+          />
+        </div>
+        <div class="w-90 flex items-center gap-4">
+          <label for="birthday" class="w-32">Return Date:</label>
+          <input
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            type="date"
+            id="end_date"
+            name="end_date"
+          />
+        </div>
+        <br />
+        <div>
+          <button
+            type="submit"
+            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
+          >
+            Submit
+          </button>
+          <button
+            type="submit"
+            class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
+            onclick="history.back()"
+          >
+            cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

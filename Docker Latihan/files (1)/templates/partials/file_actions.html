@@ -1,0 +1,6 @@
+<button class="icon-btn" onclick="openPreview({{ f.id }})" title="Preview"><i class="fa fa-eye"></i></button>
+<a href="{{ url_for('dashboard.download', file_id=f.id) }}" class="icon-btn" title="Unduh"><i class="fa fa-download"></i></a>
+<button class="icon-btn {% if f.is_starred %}starred{% endif %}" onclick="toggleStar({{ f.id }}, this)" title="Bintang"><i class="fa fa-star"></i></button>
+<button class="icon-btn" onclick="openShareModal({{ f.id }}, {{ f.is_shared|int }}, '{{ f.share_token or '' }}')" title="Bagikan"><i class="fa fa-share-alt"></i></button>
+<button class="icon-btn" onclick="openRenameFile({{ f.id }}, '{{ f.name }}')" title="Ganti nama"><i class="fa fa-edit"></i></button>
+<button class="icon-btn danger" onclick="openDeleteFile({{ f.id }}, '{{ f.name }}')" title="Hapus"><i class="fa fa-trash"></i></button>

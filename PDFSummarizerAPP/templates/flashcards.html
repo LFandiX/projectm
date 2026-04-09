@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+{% block title %}Flashcards — StudyAI{% endblock %}
+{% block page_title %}Flashcards{% endblock %}
+
+{% block head %}
+<style>
+  .tool-layout { display: grid; grid-template-columns: 280px 1fr; gap: 1.5rem; align-items: start; }
+  .sp-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .sp-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
+  .sp-label { font-size: .78rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: .5rem; display: block; }
+  .sp-select, .sp-input { width: 100%; padding: .65rem .9rem; border: 1.5px solid var(--border); border-radius: 9px; font-family: 'DM Sans',sans-serif; font-size: .875rem; background: var(--card); color: var(--ink); outline: none; }
+  .sp-select:focus, .sp-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,70,229,.1); }
+  .apikey-hint { font-size: .72rem; color: var(--muted); margin-top: .4rem; line-height: 1.5; }
+  .apikey-hint a { color: var(--accent); }
+
+  /* Flashcard deck */
+  .deck-area { display: none; }
+  .deck-area.show { display: block; }
+
+  .deck-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+  .deck-nav h2 { font-family: 'Syne',sans-serif; font-size: 1rem; font-weight: 700; color: var(--ink); }
+  .deck-progress { display: flex; align-items: center; gap: .75rem; }
+  .progress-dots { display: flex; gap: .3rem; flex-wrap: wrap; }
+  .pdot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: background .2s; }
+  .pdot.done { background: var(--green); }
+  .pdot.current { background: var(--accent); }
+
+  /* Card flip */
+  .card-wrap { perspective: 1000px; margin-bottom: 1.5rem; cursor: pointer; }
+  .flashcard { width: 100%; min-height: 240px; position: relative; transform-style: preserve-3d; transition: transform .5s cubic-bezier(.4,0,.2,1); border-radius: 18px; }
+  .flashcard.flipped { transform: rotateY(180deg); }
+  .fc-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2.5rem 2rem; text-align: center; }
+  .fc-front { background: var(--card); border: 2px solid var(--border); }
+  .fc-back { background: var(--ink); border: 2px solid var(--ink); transform: rotateY(180deg); }
+  .fc-label { font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: .85rem; }
+  .fc-front .fc-label { color: var(--muted); }
+  .fc-back .fc-label { color: #4b5563; }
+  .fc-text { font-family: 'Syne',sans-serif; font-size: 1.15rem; font-weight: 700; line-height: 1.4; letter-spacing: -.01em; }
+  .fc-front .fc-text { color: var(--ink); }
+  .fc-back .fc-text { color: #fff; }
+  .fc-hint { font-size: .78rem; color: var(--muted); margin-top: 1rem; }
+  .fc-back .fc-hint { color: #6b7280; }
+
+  .card-controls { display: flex; align-items: center; justify-content: center; gap: 1rem; }
+  .ctrl-btn { width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--card); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; transition: all .15s; }
+  .ctrl-btn:hover { background: var(--paper); border-color: #c5c2bb; }
+  .ctrl-btn.primary { width: 52px; height: 52px; background: var(--ink); border-color: var(--ink); color: #fff; font-size: 1.3rem; }
+  .ctrl-btn.primary:hover { background: #1c1c2b; }
+  .card-counter { font-family: 'Syne',sans-serif; font-size: .9rem; font-weight: 700; color: var(--muted); min-width: 60px; text-align: center; }
+
+  /* Grid view */
+  .view-toggle { display: flex; gap: .4rem; }
+  .view-btn { padding: .4rem .75rem; border: 1.5px solid var(--border); border-radius: 7px; background: var(--card); font-size: .78rem; font-weight: 600; cursor: pointer; color: var(--muted); transition: all .15s; }
+  .view-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(79,70,229,.06); }
+
+  .grid-view { display: none; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: .85rem; }
+  .grid-view.show { display: grid; }
+  .grid-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 1.1rem; cursor: pointer; transition: all .2s; }
+  .grid-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,.07); transform: translateY(-2px); border-color: var(--accent); }
+  .grid-card.flipped-grid { background: var(--ink); border-color: var(--ink); }
+  .gc-label { font-size: .65rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .5rem; color: var(--muted); }
+  .flipped-grid .gc-label { color: #4b5563; }
+  .gc-text { font-size: .85rem; font-weight: 500; color: var(--ink); line-height: 1.5; }
+  .flipped-grid .gc-text { color: #fff; }
+
+  /* Loading */
+  .loading-box { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 3rem 2rem; text-align: center; display: none; }
+  .loading-box.show { display: block; }
+  .loading-dots { display: flex; justify-content: center; gap: .4rem; margin-bottom: 1rem; }
+  .dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; animation: bounce .8s ease infinite; }
+  .dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}
+  @keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+
+  .empty-output { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 4rem 2rem; text-align: center; }
+
+  @media(max-width:960px){.tool-layout{grid-template-columns:1fr}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tool-layout">
+
+  <!-- Settings -->
+  <div>
+    <div class="sp-card">
+      <div class="card-header"><span class="card-title">🃏 Flashcard Settings</span></div>
+      <div class="sp-body">
+        <div>
+          <span class="sp-label">Select Material</span>
+          <select class="sp-select" id="mat-select" onchange="onMatChange()">
+            <option value="">— Choose a PDF —</option>
+            {% for m in materials %}
+            <option value="{{ m.id }}" {% if material and material.id == m.id %}selected{% endif %}>{{ m.original_name[:36] }}{% if m.original_name|length > 36 %}…{% endif %}</option>
+            {% endfor %}
+          </select>
+          {% if not materials %}
+          <div class="alert alert-info" style="margin-top:.75rem;font-size:.8rem">No PDFs yet. <a href="{{ url_for('materials') }}">Upload →</a></div>
+          {% endif %}
+        </div>
+
+        <div>
+          <span class="sp-label">Number of Cards (max 20)</span>
+          <input class="sp-input" type="number" id="card-count" value="10" min="4" max="20"/>
+        </div>
+
+        <div>
+          <span class="sp-label">Anthropic API Key</span>
+          <input class="sp-input" type="password" id="api-key" placeholder="sk-ant-api03-..."/>
+          <div class="apikey-hint">Get your key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></div>
+        </div>
+
+        <button class="btn btn-accent" id="gen-btn" onclick="generateCards()" {% if not materials %}disabled{% endif %}>
+          ✨ Generate Flashcards
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Output -->
+  <div>
+    <div class="loading-box" id="loading-box">
+      <div class="loading-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <div style="font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.3rem">Generating flashcards...</div>
+      <div style="font-size:.83rem;color:var(--muted)">AI is creating cards from your material</div>
+    </div>
+
+    <div id="error-box"></div>
+
+    <div class="deck-area" id="deck-area">
+      <div class="deck-nav">
+        <h2>Flashcards <span id="deck-count-badge" class="badge badge-blue" style="margin-left:.4rem"></span></h2>
+        <div style="display:flex;gap:.5rem;align-items:center">
+          <div class="view-toggle">
+            <button class="view-btn active" id="vbtn-study" onclick="setView('study')">Study</button>
+            <button class="view-btn" id="vbtn-grid" onclick="setView('grid')">Grid</button>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="generateCards()">↻ Regenerate</button>
+        </div>
+      </div>
+
+      <!-- Study mode -->
+      <div id="study-view">
+        <div class="progress-dots" id="progress-dots" style="margin-bottom:1rem"></div>
+        <div class="card-wrap" onclick="flipCard()">
+          <div class="flashcard" id="flashcard">
+            <div class="fc-face fc-front">
+              <div class="fc-label">Front</div>
+              <div class="fc-text" id="fc-front-text"></div>
+              <div class="fc-hint">Click to reveal answer</div>
+            </div>
+            <div class="fc-face fc-back">
+              <div class="fc-label">Back</div>
+              <div class="fc-text" id="fc-back-text"></div>
+              <div class="fc-hint">Click to flip back</div>
+            </div>
+          </div>
+        </div>
+        <div class="card-controls">
+          <button class="ctrl-btn" onclick="navigate(-1)" title="Previous">←</button>
+          <span class="card-counter" id="card-counter"></span>
+          <button class="ctrl-btn primary" onclick="flipCard()" title="Flip">↕</button>
+          <span class="card-counter"></span>
+          <button class="ctrl-btn" onclick="navigate(1)" title="Next">→</button>
+        </div>
+      </div>
+
+      <!-- Grid mode -->
+      <div class="grid-view" id="grid-view"></div>
+    </div>
+
+    <div class="empty-output" id="empty-output">
+      <div class="empty-icon">🃏</div>
+      <div class="empty-title">No flashcards yet</div>
+      <div class="empty-desc">Select a PDF, enter your API key, and generate cards.</div>
+    </div>
+
+    {% if material and material.flashcards %}
+    <script>window.existingCards = {{ material.flashcards | tojson }};</script>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+let cards = [];
+let currentIdx = 0;
+let isFlipped = false;
+
+function onMatChange() {
+  const id = document.getElementById('mat-select').value;
+  if (id) window.location.href = '/flashcards?id=' + id;
+}
+
+function setView(v) {
+  document.getElementById('study-view').style.display = v === 'study' ? 'block' : 'none';
+  const gv = document.getElementById('grid-view');
+  gv.classList.toggle('show', v === 'grid');
+  document.getElementById('vbtn-study').classList.toggle('active', v === 'study');
+  document.getElementById('vbtn-grid').classList.toggle('active', v === 'grid');
+}
+
+function renderCards(cs) {
+  cards = cs;
+  currentIdx = 0;
+  isFlipped = false;
+  document.getElementById('deck-area').classList.add('show');
+  document.getElementById('empty-output').style.display = 'none';
+  document.getElementById('deck-count-badge').textContent = cs.length + ' cards';
+  showCard();
+  renderGrid();
+}
+
+function showCard() {
+  if (!cards.length) return;
+  const card = cards[currentIdx];
+  isFlipped = false;
+  document.getElementById('flashcard').classList.remove('flipped');
+  document.getElementById('fc-front-text').textContent = card.front;
+  document.getElementById('fc-back-text').textContent = card.back;
+  document.getElementById('card-counter').textContent = `${currentIdx+1} / ${cards.length}`;
+  // dots
+  const dots = document.getElementById('progress-dots');
+  dots.innerHTML = '';
+  cards.forEach((_,i) => {
+    const d = document.createElement('div');
+    d.className = 'pdot' + (i < currentIdx ? ' done' : i === currentIdx ? ' current' : '');
+    dots.appendChild(d);
+  });
+}
+
+function flipCard() {
+  isFlipped = !isFlipped;
+  document.getElementById('flashcard').classList.toggle('flipped', isFlipped);
+}
+
+function navigate(dir) {
+  currentIdx = (currentIdx + dir + cards.length) % cards.length;
+  showCard();
+}
+
+function renderGrid() {
+  const grid = document.getElementById('grid-view');
+  grid.innerHTML = '';
+  cards.forEach((c, i) => {
+    const el = document.createElement('div');
+    el.className = 'grid-card';
+    el.innerHTML = `<div class="gc-label" id="gc-lbl-${i}">Front</div><div class="gc-text" id="gc-txt-${i}">${c.front}</div>`;
+    el.onclick = () => {
+      const flipped = el.classList.toggle('flipped-grid');
+      document.getElementById(`gc-lbl-${i}`).textContent = flipped ? 'Back' : 'Front';
+      document.getElementById(`gc-txt-${i}`).textContent = flipped ? c.back : c.front;
+    };
+    grid.appendChild(el);
+  });
+}
+
+async function generateCards() {
+  const id = document.getElementById('mat-select').value;
+  const key = document.getElementById('api-key').value.trim();
+  const count = parseInt(document.getElementById('card-count').value) || 10;
+  if (!id) { document.getElementById('error-box').innerHTML='<div class="alert alert-error">Please select a material.</div>'; return; }
+  if (!key) { document.getElementById('error-box').innerHTML='<div class="alert alert-error">Please enter your API key.</div>'; return; }
+
+  document.getElementById('loading-box').classList.add('show');
+  document.getElementById('deck-area').classList.remove('show');
+  document.getElementById('empty-output').style.display = 'none';
+  document.getElementById('error-box').innerHTML = '';
+  const btn = document.getElementById('gen-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Generating...';
+
+  try {
+    const res = await fetch('/api/generate-flashcards', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({id, api_key: key, count})
+    });
+    const data = await res.json();
+    document.getElementById('loading-box').classList.remove('show');
+    if (data.flashcards) {
+      renderCards(data.flashcards);
+    } else {
+      document.getElementById('error-box').innerHTML=`<div class="alert alert-error">${data.error||'Unknown error'}</div>`;
+      document.getElementById('empty-output').style.display='block';
+    }
+  } catch(e) {
+    document.getElementById('loading-box').classList.remove('show');
+    document.getElementById('error-box').innerHTML='<div class="alert alert-error">Network error.</div>';
+    document.getElementById('empty-output').style.display='block';
+  }
+  btn.disabled = false; btn.innerHTML = '✨ Generate Flashcards';
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if (!cards.length) return;
+  if (e.key === 'ArrowRight') navigate(1);
+  if (e.key === 'ArrowLeft') navigate(-1);
+  if (e.key === ' ') { e.preventDefault(); flipCard(); }
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (window.existingCards && window.existingCards.length) renderCards(window.existingCards);
+});
+</script>
+{% endblock %}

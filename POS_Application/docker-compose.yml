@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: pos_mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: FNDDatabase.1
+      MYSQL_DATABASE: toko_digital
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db-init:/docker-entrypoint-initdb.d # Menghubungkan folder init ke MySQL
+
+  web:
+    build: .
+    container_name: pos_flask_app
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASS=FNDDatabase.1
+      - DB_NAME=toko_digital
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+      - ./backups:/app/backups
+
+volumes:
+  db_data:

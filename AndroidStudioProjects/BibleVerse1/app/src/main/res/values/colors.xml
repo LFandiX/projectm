@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    
+    <color name="bg_cream">#FEF3C7</color>
+    <color name="blue_900">#1E3A8A</color>
+    <color name="orange_600">#D97706</color>
+    <color name="orange_500">#F59E0B</color>
+    <color name="orange_100">#FFEDD5</color>
+    <color name="orange_400">#FDBA74</color>
+    <color name="green_700">#15803D</color>
+    <color name="stone_700">#44403C</color>
+    <color name="stone_500">#78716C</color>
+    <color name="stone_200">#E7E5E4</color>
+    <color name="stone_400">#A8A29E</color>
+</resources>

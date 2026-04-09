@@ -1,0 +1,143 @@
+{% extends "dashboard/layout.html" %}
+{% block title %}
+  {% if search %}Hasil: "{{ search }}"{% elif current_folder %}{{ current_folder.name }}{% else %}Beranda{% endif %} — NexDrive
+{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<div class="page-header">
+  <div class="breadcrumb">
+    <a href="{{ url_for('dashboard.index') }}" class="bc-item"><i class="fa fa-home"></i></a>
+    {% for crumb in breadcrumb %}
+    <span class="bc-sep"><i class="fa fa-chevron-right"></i></span>
+    <a href="{{ url_for('dashboard.index', folder=crumb.id) }}" class="bc-item">{{ crumb.name }}</a>
+    {% endfor %}
+    {% if current_folder %}
+    <span class="bc-sep"><i class="fa fa-chevron-right"></i></span>
+    <span class="bc-item active">{{ current_folder.name }}</span>
+    {% endif %}
+  </div>
+  <div class="view-toggle">
+    <a href="?{% if folder_id %}folder={{ folder_id }}&{% endif %}{% if search %}q={{ search }}&{% endif %}view=grid" class="view-btn {% if view == 'grid' %}active{% endif %}"><i class="fa fa-th-large"></i></a>
+    <a href="?{% if folder_id %}folder={{ folder_id }}&{% endif %}{% if search %}q={{ search }}&{% endif %}view=list" class="view-btn {% if view == 'list' %}active{% endif %}"><i class="fa fa-list"></i></a>
+  </div>
+</div>
+
+{% if search %}
+<div class="section-title">
+  <i class="fa fa-search"></i> Hasil pencarian untuk "{{ search }}"
+  <a href="{{ url_for('dashboard.index', folder=folder_id) }}" class="clear-search"><i class="fa fa-times"></i></a>
+</div>
+{% endif %}
+
+<!-- Recent Files (only on root, no search) -->
+{% if recent and not search %}
+<section class="section">
+  <div class="section-title"><i class="fa fa-clock"></i> Terbaru</div>
+  <div class="recent-strip">
+    {% for f in recent %}
+    <div class="recent-card" onclick="openPreview({{ f.id }})">
+      <div class="recent-icon" style="color:{{ file_color(f.file_type) }}">
+        <i class="fa {{ file_icon(f.file_type) }}"></i>
+      </div>
+      <div class="recent-info">
+        <div class="recent-name">{{ f.name | truncate(20) }}</div>
+        <div class="recent-meta">{{ f.size | filesize }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- Folders -->
+{% if folders %}
+<section class="section">
+  <div class="section-title"><i class="fa fa-folder"></i> Folder ({{ folders|length }})</div>
+  <div class="folder-grid">
+    {% for folder in folders %}
+    <div class="folder-card" data-id="{{ folder.id }}" data-name="{{ folder.name }}">
+      <a href="{{ url_for('dashboard.index', folder=folder.id) }}" class="folder-main">
+        <div class="folder-icon" style="color:{{ folder.color }}">
+          <i class="fa fa-folder"></i>
+        </div>
+        <div class="folder-name">{{ folder.name }}</div>
+      </a>
+      <div class="folder-menu">
+        <button class="icon-btn" onclick="openRenameFolder({{ folder.id }}, '{{ folder.name }}')"><i class="fa fa-edit"></i></button>
+        <button class="icon-btn danger" onclick="openDeleteFolder({{ folder.id }}, '{{ folder.name }}')"><i class="fa fa-trash"></i></button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- Files -->
+<section class="section">
+  {% if folders %}<div class="section-title"><i class="fa fa-file"></i> File ({{ files|length }})</div>{% endif %}
+  {% if files %}
+    {% if view == 'list' %}
+    <div class="file-table-wrap">
+      <table class="file-table">
+        <thead>
+          <tr>
+            <th>Nama</th><th>Tipe</th><th>Ukuran</th><th>Diubah</th><th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in files %}
+          <tr class="file-row" data-id="{{ f.id }}" data-name="{{ f.name }}">
+            <td class="file-name-cell">
+              <i class="fa {{ file_icon(f.file_type) }}" style="color:{{ file_color(f.file_type) }}"></i>
+              <span onclick="openPreview({{ f.id }})">{{ f.name }}</span>
+              {% if f.is_starred %}<i class="fa fa-star star-badge"></i>{% endif %}
+              {% if f.is_shared %}<i class="fa fa-share-alt share-badge"></i>{% endif %}
+            </td>
+            <td><span class="type-badge type-{{ f.file_type }}">{{ f.file_type }}</span></td>
+            <td>{{ f.size | filesize }}</td>
+            <td>{{ f.updated_at | reltime }}</td>
+            <td class="file-actions-cell">
+              {% include 'partials/file_actions.html' %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="file-grid">
+      {% for f in files %}
+      <div class="file-card" data-id="{{ f.id }}" data-name="{{ f.name }}">
+        <div class="file-card-top" onclick="openPreview({{ f.id }})">
+          <div class="file-thumb" style="border-color:{{ file_color(f.file_type) }}20">
+            <i class="fa {{ file_icon(f.file_type) }}" style="color:{{ file_color(f.file_type) }}"></i>
+          </div>
+          <div class="file-badges">
+            {% if f.is_starred %}<span class="badge-star"><i class="fa fa-star"></i></span>{% endif %}
+            {% if f.is_shared %}<span class="badge-share"><i class="fa fa-share-alt"></i></span>{% endif %}
+          </div>
+        </div>
+        <div class="file-card-bottom">
+          <div class="file-card-name">{{ f.name | truncate(25) }}</div>
+          <div class="file-card-meta">{{ f.size | filesize }} · {{ f.updated_at | reltime }}</div>
+          <div class="file-card-actions">
+            {% include 'partials/file_actions.html' %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon"><i class="fa fa-cloud-upload-alt"></i></div>
+    <h3>{% if search %}Tidak ada hasil untuk "{{ search }}"{% else %}Folder ini kosong{% endif %}</h3>
+    <p>{% if not search %}Upload file atau buat folder baru untuk memulai{% endif %}</p>
+    {% if not search %}
+    <button onclick="openUploadModal()" class="btn-primary"><i class="fa fa-upload"></i> Upload File</button>
+    {% endif %}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width= , initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="text-gray-600">
+    <div>
+      <!--  content wraper -->
+      <div>
+        <nav class="bg-gray-200">
+          <div class="flex justify-between">
+            <div class="flex place-items-center">
+              <h1 class="font-bold uppercase p-4 border-b border-gray-100">
+                <a href="/">SEWANITY</a>
+              </h1>
+              <ul class="flex">
+                <li class="text-gray-700 font-bold ml-2">
+                  <a href="/home">
+                    <span>Home</span>
+                  </a>
+                </li>
+                <li class="text-gray-700 font-bold ml-2">
+                  <a href="/about-us">
+                    <span>About</span>
+                  </a>
+                </li>
+                <li class="text-gray-700 font-bold ml-2">
+                  <a href="/contact">
+                    <span>Contact</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {% if session_user != None %}
+            <div class="flex place-items-center mr-5">
+              <a class="text-red-600 ml-2" href="/logout">Log out</a>
+            </div>
+            {%else%}
+            <div
+              class="flex justify-center md:justify-end place-items-center mr-7"
+            >
+              <a class="text-red-600 ml-2" href="/login">Log in</a>
+              <a class="text-red-600 ml-2" href="/register">Sign up</a>
+            </div>
+            {%endif%}
+          </div>
+        </nav>
+        <main>
+          <div class="flex gap-5 place-items-center justify-center sm:flex-col md:flex-row">
+            <!-- card -->
+            <div class="max-w-sm rounded overflow-hidden shadow-lg relative">
+              <img
+                class="w-full"
+                src="{{ url_for('static', filename=car['image_link']) }}"
+                alt="{{ car['brand'] }} {{ car['model'] }}"
+              />
+              <div class="px-6 py-4">
+                <div class="flex self-center">
+                  <p class="font-bold text-xl mb-2 mr-2">
+                    {{ car['brand'] + " " + car['model'] }}
+                  </p>
+                  <span
+                    class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                    >Rp{{ car['price_per_day']}} / day</span
+                  >
+                </div>
+                <p class="text-gray-700 text-base">{{ car['description'] }}</p>
+              </div>
+              <div class="px-6 pt-4 pb-2">
+                <span
+                  class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                  >{{ car['seats'] }} Seat(s)</span
+                >
+                <span
+                  class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                  >{{ car['mode'] }}</span
+                >
+                <span
+                  class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                  >{{ car['fuel'] }}</span
+                >
+                <span
+                  class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                  >{{ car['status'] }}</span
+                >
+              </div>
+            </div>
+            <!-- description available -->
+            <div>
+              <div>
+                <div class="relative overflow-x-auto">
+                  <table
+                    class="w-full text-lg text-left rtl:text-right text-gray-500"
+                  >
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                      <tr>
+                        <th scope="col" class="px-6 py-3">Status</th>
+                        <th scope="col" class="px-6 py-3">Price</th>
+                        <th scope="col" class="px-6 py-3">...</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr class="bg-white border-b border-gray-200">
+                        <td class="px-6 py-4">{{car['status']}}</td>
+                        <td class="px-6 py-4">
+                          Rp.{{car['price_per_day']}} / day
+                        </td>
+                        <td class="px-6 py-4">
+                          {% if car['id'] not in history %}
+                          <a href="/product/rent/{{ car['id'] }}">
+                            <button
+                              type="button"
+                              data-modal-target="default-modal"
+                              data-modal-toggle="default-modal"
+                              class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                            >
+                              Rent
+                            </button>
+                          </a>
+                          {%else%}
+                          <button
+                            type="button"
+                            data-modal-target="default-modal"
+                            data-modal-toggle="default-modal"
+                            class="focus:outline-none text-white bg-gray-700 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+                            disabled
+                          >
+                            Rented
+                          </button>
+                          {% endif %}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

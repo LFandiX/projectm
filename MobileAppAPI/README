@@ -1,0 +1,21 @@
+Panduan Instalasi/ Aktivasi API
+
+Macbook:
+1. Buat Environment: 
+    Perintah bash: "python3 -m venv env"
+2. Aktifkan Environment
+    Perintah bash: "source env/bin/activate"
+3. Instalasi Library di requirements.txt
+    Perintah bash: "pip install -r requirements.txt"
+4. Jalankan Program
+    Perintah bash: "python3 app.py"
+
+Windows:
+1. Buat Environment: 
+    Perintah bash: "python -m venv env"
+2. Aktifkan Environment
+    Perintah bash: "env\Scripts\activate"
+3. Instalasi Library di requirements.txt
+    Perintah bash: "pip install -r requirements.txt"
+4. Jalankan Program
+    Perintah bash: "python app.py"
